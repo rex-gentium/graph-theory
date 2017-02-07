@@ -1,7 +1,5 @@
 ﻿#include "Graph.h"
 
-
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -37,7 +35,8 @@ void Graph::addEdge(int from, int to, int weight) {
 	switch (this->graphForm) {
 	case RepresentationType::ADJMATRIX:
 		adjacencyMatrix[from][to] = (weighted) ? weight : 1;
-		adjacencyMatrix[to][from] = adjacencyMatrix[from][to];
+		if (!oriented)
+			adjacencyMatrix[to][from] = adjacencyMatrix[from][to];
 		break;
 	case RepresentationType::ADJLIST:
 		if (weighted) {
@@ -66,7 +65,9 @@ void Graph::removeEdge(int from, int to) {
 	switch (this->graphForm) {
 
 	case RepresentationType::ADJMATRIX:
-		adjacencyMatrix[from][to] = adjacencyMatrix[to][from] = 0;
+		adjacencyMatrix[from][to] = 0;
+		if (!oriented)
+			adjacencyMatrix[to][from] = 0;
 		break;
 
 	case RepresentationType::ADJLIST: {
@@ -131,7 +132,9 @@ int Graph::changeEdge(int from, int to, int newWeight) {
 	
 	case RepresentationType::ADJMATRIX:
 		oldWeight = adjacencyMatrix[from][to];
-		adjacencyMatrix[from][to] = adjacencyMatrix[to][from] = newWeight;
+		adjacencyMatrix[from][to] = newWeight;
+		if (!oriented)
+			adjacencyMatrix[to][from] = newWeight;
 		break;
 
 	case RepresentationType::ADJLIST: {
