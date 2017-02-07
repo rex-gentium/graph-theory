@@ -178,7 +178,10 @@ void Graph::transformToAdjList() {
 	{
 	case RepresentationType::ADJLIST: break;
 	case RepresentationType::ADJMATRIX:
-		adjacencyList.resize(vertexCount);
+		if (weighted)
+			weightedAdjacencyList.resize(vertexCount);
+		else 
+			adjacencyList.resize(vertexCount);
 		for (int i = 0; i < vertexCount; i++) {
 			for (int j = 0; j < vertexCount; j++)
 				if (adjacencyMatrix[i][j]) {
@@ -193,20 +196,27 @@ void Graph::transformToAdjList() {
 		break;
 
 	case RepresentationType::EDGELIST:
-		adjacencyList.resize(vertexCount);
-		if (weighted)
+		if (weighted) {
+			weightedAdjacencyList.resize(vertexCount);
 			for (auto & edge : weightedEdgeList) {
 				int i = get<0>(edge);
 				int j = get<1>(edge);
 				int weight = get<2>(edge);
 				weightedAdjacencyList[i].insert(make_pair(j, weight));
+				if (!oriented)
+					weightedAdjacencyList[j].insert(make_pair(i, weight));
 			}
-		else
+		}
+		else {
+			adjacencyList.resize(vertexCount);
 			for (auto & edge : edgeList) {
 				int i = get<0>(edge);
 				int j = get<1>(edge);
 				adjacencyList[i].insert(j);
+				if (!oriented)
+					adjacencyList[j].insert(i);
 			}
+		}
 		break;
 	}
 	graphForm = RepresentationType::ADJLIST;
@@ -242,6 +252,8 @@ void Graph::transformToAdjMatrix() {
 
 	case RepresentationType::EDGELIST:
 		adjacencyMatrix.resize(vertexCount);
+		for (int i = 0; i < vertexCount; i++)
+			adjacencyMatrix[i].resize(vertexCount, 0);
 		if (weighted) {
 			for (const auto & edge : weightedEdgeList) {
 				int i = get<0>(edge);

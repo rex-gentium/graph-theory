@@ -4,11 +4,11 @@ int main() {
 	Graph graph;
 
 	//graph.readGraph("D:\\test_adjMatrix.txt");
-	graph.readGraph("D:\\test_weightedAdjMatrix.txt");
+	//graph.readGraph("D:\\test_weightedAdjMatrix.txt");
 	//graph.readGraph("D:\\test_adjList.txt");
 	//graph.readGraph("D:\\test_weightedAdjList.txt");
 	//graph.readGraph("D:\\test_edgeList.txt");
-	//graph.readGraph("D:\\test_weightedEdgeList.txt");
+	graph.readGraph("D:\\test_weightedEdgeList.txt");
 	
 	//graph.transformToAdjMatrix();
 	graph.transformToAdjList();
