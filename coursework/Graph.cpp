@@ -35,18 +35,18 @@ void Graph::addEdge(int from, int to, int weight) {
 	switch (this->graphForm) {
 	case RepresentationType::ADJMATRIX:
 		adjacencyMatrix[from][to] = (weighted) ? weight : 1;
-		if (!oriented)
+		if (!directed)
 			adjacencyMatrix[to][from] = adjacencyMatrix[from][to];
 		break;
 	case RepresentationType::ADJLIST:
 		if (weighted) {
 			weightedAdjacencyList[from].insert(make_pair(to, weight));
-			if (!oriented)
+			if (!directed)
 				weightedAdjacencyList[to].insert(make_pair(from, weight));
 		}
 		else {
 			adjacencyList[from].insert(to);
-			if (!oriented)
+			if (!directed)
 				adjacencyList[to].insert(from);
 		}
 		break;
@@ -66,7 +66,7 @@ void Graph::removeEdge(int from, int to) {
 
 	case RepresentationType::ADJMATRIX:
 		adjacencyMatrix[from][to] = 0;
-		if (!oriented)
+		if (!directed)
 			adjacencyMatrix[to][from] = 0;
 		break;
 
@@ -77,7 +77,7 @@ void Graph::removeEdge(int from, int to) {
 			auto it = vertexAdjList.lower_bound(make_pair(to, 0));
 			if (it != vertexAdjList.end())
 				vertexAdjList.erase(it);
-			if (!oriented) {
+			if (!directed) {
 				// в неориентированном графе списки дублируются
 				vertexAdjList = weightedAdjacencyList[to];
 				it = vertexAdjList.lower_bound(make_pair(from, 0));
@@ -90,7 +90,7 @@ void Graph::removeEdge(int from, int to) {
 			auto it = vertexAdjList->find(to);
 			if (it != vertexAdjList->end())
 				vertexAdjList->erase(it);
-			if (!oriented) {
+			if (!directed) {
 				// в неориентированном графе списки дублируются
 				vertexAdjList = &(adjacencyList[to]);
 				it = vertexAdjList->find(from);
@@ -106,7 +106,7 @@ void Graph::removeEdge(int from, int to) {
 			auto it = weightedEdgeList.lower_bound(make_tuple(from, to, 0));
 			if (it != weightedEdgeList.end())
 				weightedEdgeList.erase(it);
-			if (!oriented) {
+			if (!directed) {
 				// в неориентированном графе ребро может связывать вершины в обратном порядке
 				it = weightedEdgeList.lower_bound(make_tuple(to, from, 0));
 				if (it != weightedEdgeList.end())
@@ -115,7 +115,7 @@ void Graph::removeEdge(int from, int to) {
 		}
 		else {
 			edgeList.erase(make_pair(from, to));
-			if (!oriented)
+			if (!directed)
 				edgeList.erase(make_pair(to, from));
 		}
 		break;
@@ -133,7 +133,7 @@ int Graph::changeEdge(int from, int to, int newWeight) {
 	case RepresentationType::ADJMATRIX:
 		oldWeight = adjacencyMatrix[from][to];
 		adjacencyMatrix[from][to] = newWeight;
-		if (!oriented)
+		if (!directed)
 			adjacencyMatrix[to][from] = newWeight;
 		break;
 
@@ -144,7 +144,7 @@ int Graph::changeEdge(int from, int to, int newWeight) {
 			oldWeight = it->second;
 			vertexAdjList->insert(it, make_pair(to, newWeight));
 		}
-		if (!oriented) {
+		if (!directed) {
 			// неориентированный граф дублирует списки
 			vertexAdjList = &(weightedAdjacencyList[to]);
 			it = vertexAdjList->lower_bound(make_pair(from, 0));
@@ -162,7 +162,7 @@ int Graph::changeEdge(int from, int to, int newWeight) {
 			oldWeight = get<2>(*it);
 			weightedEdgeList.insert(it, make_tuple(from, to, newWeight));
 		}
-		if (!oriented) {
+		if (!directed) {
 			// в неориентированном графе ребро может связывать вершины в обратном порядке
 			it = weightedEdgeList.lower_bound(make_tuple(to, from, 0));
 			if (it != weightedEdgeList.end() && get<0>(*it) == to && get<1>(*it) == from) {
@@ -206,7 +206,7 @@ void Graph::transformToAdjList() {
 				int j = get<1>(edge);
 				int weight = get<2>(edge);
 				weightedAdjacencyList[i].insert(make_pair(j, weight));
-				if (!oriented)
+				if (!directed)
 					weightedAdjacencyList[j].insert(make_pair(i, weight));
 			}
 		}
@@ -216,7 +216,7 @@ void Graph::transformToAdjList() {
 				int i = get<0>(edge);
 				int j = get<1>(edge);
 				adjacencyList[i].insert(j);
-				if (!oriented)
+				if (!directed)
 					adjacencyList[j].insert(i);
 			}
 		}
@@ -263,7 +263,7 @@ void Graph::transformToAdjMatrix() {
 				int j = get<1>(edge);
 				int weight = get<2>(edge);
 				adjacencyMatrix[i][j] = weight;
-				if (!oriented)
+				if (!directed)
 					adjacencyMatrix[j][i] = weight;
 			}
 			weightedEdgeList.clear();
@@ -273,7 +273,7 @@ void Graph::transformToAdjMatrix() {
 				int i = edge.first;
 				int j = edge.second;
 				adjacencyMatrix[i][j] = 1;
-				if (!oriented)
+				if (!directed)
 					adjacencyMatrix[j][i] = 1;
 			}
 			edgeList.clear();
@@ -288,7 +288,7 @@ void Graph::transformToListOfEdges() {
 	case RepresentationType::EDGELIST: break;
 	case RepresentationType::ADJMATRIX:
 		for (int i = 0; i < vertexCount; i++) {
-			for (int j = (oriented) ? 0 : i; j < vertexCount; j++)
+			for (int j = (directed) ? 0 : i; j < vertexCount; j++)
 				if (adjacencyMatrix[i][j]) {
 					if (weighted)
 						weightedEdgeList.insert(make_tuple(i, j, adjacencyMatrix[i][j]));
@@ -305,7 +305,7 @@ void Graph::transformToListOfEdges() {
 			for (int i = 0; i < vertexCount; i++) {
 				for (const auto & adjacency : weightedAdjacencyList[i]) {
 					int j = adjacency.first;
-					if (!oriented && i > j) continue; // в неориентированном графе список смежности дублирует ребра
+					if (!directed && i > j) continue; // в неориентированном графе список смежности дублирует ребра
 					int weight = adjacency.second;
 					weightedEdgeList.insert(make_tuple(i, j, weight));
 				}
@@ -316,7 +316,7 @@ void Graph::transformToListOfEdges() {
 		else {
 			for (int i = 0; i < vertexCount; i++) {
 				for (const int & j : adjacencyList[i]) {
-					if (!oriented && i > j) continue; // в неориентированном графе список смежности дублирует ребра
+					if (!directed && i > j) continue; // в неориентированном графе список смежности дублирует ребра
 					edgeList.insert(make_pair(i, j));
 				}
 				adjacencyList[i].clear();
@@ -340,7 +340,7 @@ void Graph::writeGraph(const string fileName) {
 		break;
 	case RepresentationType::ADJLIST:
 		outFile << 'L' << ' ' << vertexCount << '\n'
-			<< ((oriented) ? 1 : 0) << ' ' << ((weighted) ? 1 : 0) << '\n';
+			<< ((directed) ? 1 : 0) << ' ' << ((weighted) ? 1 : 0) << '\n';
 		if (weighted) {
 			for (int i = 0; i < vertexCount; i++) {
 				for (const auto & adjacency : weightedAdjacencyList[i])
@@ -359,7 +359,7 @@ void Graph::writeGraph(const string fileName) {
 	case RepresentationType::EDGELIST:
 		outFile << 'E' << ' ' << vertexCount << ' ' 
 			<< ((weighted) ? weightedEdgeList.size() : edgeList.size()) << '\n'
-			<< ((oriented) ? 1 : 0) << ' ' << ((weighted) ? 1 : 0) << '\n';
+			<< ((directed) ? 1 : 0) << ' ' << ((weighted) ? 1 : 0) << '\n';
 		if (weighted)
 			for (const auto & edge : weightedEdgeList)
 					outFile << get<0>(edge) + 1 << ' ' << get<1>(edge) + 1 << ' ' << get<2>(edge) << '\n';
@@ -382,22 +382,22 @@ void Graph::readGraphAdjMatrix(ifstream & inpFile) {
 		for (int j = 0; j < vertexCount; j++)
 			inpFile >> adjacencyMatrix[i][j];
 	}
+	this->graphForm = RepresentationType::ADJMATRIX;
 	// проверка на ориентированность
-	this->oriented = false;
+	this->directed = false;
 	for (int i = 0; i < vertexCount; i++)
 		for (int j = i; j < vertexCount; j++)
 			if (adjacencyMatrix[i][j] != adjacencyMatrix[j][i]) {
-				this->oriented = true;
-				break;
+				this->directed = true;
+				return; // этот цикл всегда должен стоять последним в методе
 			}
-	this->graphForm = RepresentationType::ADJMATRIX;
 }
 
 void Graph::readGraphAdjList(ifstream & inpFile) {
 	int orientationFlag, weightFlag;
 	inpFile >> this->vertexCount;
 	inpFile >> orientationFlag;
-	this->oriented = (orientationFlag > 0);
+	this->directed = (orientationFlag > 0);
 	inpFile >> weightFlag;
 	this->weighted = (weightFlag > 0);
 	string line;
@@ -439,7 +439,7 @@ void Graph::readGraphEdgeList(ifstream & inpFile) {
 	int edgeCount;
 	inpFile >> edgeCount;
 	inpFile >> orientationFlag;
-	this->oriented = (orientationFlag > 0);
+	this->directed = (orientationFlag > 0);
 	inpFile >> weightFlag;
 	this->weighted = (weightFlag > 0);
 	for (int e = 0; e < edgeCount; e++) {
