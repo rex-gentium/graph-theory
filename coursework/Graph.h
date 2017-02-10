@@ -11,8 +11,9 @@ public:
 	Graph();
 	~Graph();
 
+	// note: воспримет ориентированный граф без петель и симметричной матрицей как неориентированный
 	void readGraph(const string fileName);
-	void addEdge(int from, int to, int weight);
+	void addEdge(int from, int to, int weight = 0);
 	void removeEdge(int from, int to);
 	// возвращает предыдущее значение веса ребра
 	int changeEdge(int from, int to, int newWeight);
@@ -35,5 +36,28 @@ private:
 	void readGraphAdjMatrix(ifstream & inpFile);
 	void readGraphAdjList(ifstream & inpFile);
 	void readGraphEdgeList(ifstream & inpFile);
+
+	void writeGraphAdjMatrix(ofstream & outFile);
+	void writeGraphAdjList(ofstream & outFile);
+	void writeGraphEdgeList(ofstream & outFile);
+
+	void addEdgeAdjMatrix(int from, int to, int weight);
+	void addEdgeAdjList(int from, int to, int weight);
+	void addEdgeEdgeList(int from, int to, int weight);
+
+	int changeEdgeAdjMatrix(int from, int to, int newWeight);
+	int changeEdgeAdjList(int from, int to, int newWeight);
+	int changeEdgeEdgeList(int from, int to, int newWeight);
+
+	void removeEdgeAdjMatrix(int from, int to);
+	void removeEdgeAdjList(int from, int to);
+	void removeEdgeEdgeList(int from, int to);
+
+	void transformAdjListToAdjMatrix();
+	void transformEdgeListToAdjMatrix();
+	void transformAdjMatrixToAdjList();
+	void transformEdgeListToAdjList();
+	void transformAdjMatrixToEdgeList();
+	void transformAdjListToEdgeList();
 };
 
