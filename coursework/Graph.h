@@ -25,8 +25,8 @@ public:
 private:
 	RepresentationType graphForm;
 	int vertexCount;
-	bool directed;
-	bool weighted;
+	bool isDirected;
+	bool isWeighted;
 	vector<vector<int>> adjacencyMatrix;
 	vector<set<int>> adjacencyList;
 	vector<set<pair<int, int>>> weightedAdjacencyList;
