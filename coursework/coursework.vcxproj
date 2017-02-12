@@ -142,10 +142,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AdjacencyList.h" />
+    <ClInclude Include="AdjacencyMatrix.h" />
+    <ClInclude Include="EdgeList.h" />
     <ClInclude Include="Graph.h" />
+    <ClInclude Include="GraphContent.h" />
+    <ClInclude Include="GraphTrasformer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AdjacencyList.cpp" />
+    <ClCompile Include="AdjacencyMatrix.cpp" />
+    <ClCompile Include="EdgeList.cpp" />
     <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="GraphContent.cpp" />
+    <ClCompile Include="GraphTrasformer.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
