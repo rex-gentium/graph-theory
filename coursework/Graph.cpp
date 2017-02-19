@@ -10,6 +10,13 @@
 
 Graph::Graph() {}
 
+Graph::Graph(int vertexCount) {
+	content = new EdgeList();
+	content->isDirected = false;
+	content->isWeighted = true;
+	content->vertexCount = vertexCount;
+}
+
 Graph::~Graph() {}
 
 void Graph::readGraph(const string fileName) {
@@ -19,80 +26,87 @@ void Graph::readGraph(const string fileName) {
 	mode = inpFile.get();
 	switch (mode) {
 		case 'C' : 
-			representation = new AdjacencyMatrix();
+			content = new AdjacencyMatrix();
 			break;
 		case 'L' : 
-			representation = new AdjacencyList();
+			content = new AdjacencyList();
 			break;
 		case 'E' : 
-			representation = new EdgeList();
+			content = new EdgeList();
 			break;
 	}
-	representation->read(inpFile);
+	content->read(inpFile);
 	inpFile.close();
 }
 
 void Graph::addEdge(int from, int to, int weight) {
 	--from;
 	--to;
-	representation->addEdge(from, to, weight);
+	content->addEdge(from, to, weight);
 }
 
 void Graph::removeEdge(int from, int to) {
 	--from;
 	--to;
-	representation->removeEdge(from, to);
+	content->removeEdge(from, to);
 }
 
 int Graph::changeEdge(int from, int to, int newWeight) {
-	if (!representation->isWeighted) return 0; // бессмысленная операция
+	if (!content->isWeighted) return 0; // бессмысленная операция
 	--from;
 	--to;
-	return representation->changeEdge(from, to, newWeight);
+	return content->changeEdge(from, to, newWeight);
 }
 
 void Graph::transformToAdjList() {
 	AdjacencyList * adjListRepr = new AdjacencyList();
 	bool isTransformed = false;
-	if (AdjacencyMatrix* adjMatrixRepr = dynamic_cast<AdjacencyMatrix*>(representation))
+	if (AdjacencyMatrix* adjMatrixRepr = dynamic_cast<AdjacencyMatrix*>(content))
 		isTransformed = GraphTrasformer::transferContent(adjMatrixRepr, adjListRepr);
-	else if (EdgeList* edgeListRepr = dynamic_cast<EdgeList*>(representation))
+	else if (EdgeList* edgeListRepr = dynamic_cast<EdgeList*>(content))
 		isTransformed = GraphTrasformer::transferContent(edgeListRepr, adjListRepr);
 	if (isTransformed) {
-		delete representation;
-		representation = adjListRepr;
+		delete content;
+		content = adjListRepr;
 	}
 }
 
 void Graph::transformToAdjMatrix() {
 	AdjacencyMatrix * adjMatrixRepr = new AdjacencyMatrix();
 	bool isTransformed = false;
-	if (AdjacencyList* adjListRepr = dynamic_cast<AdjacencyList*>(representation))
+	if (AdjacencyList* adjListRepr = dynamic_cast<AdjacencyList*>(content))
 		isTransformed = GraphTrasformer::transferContent(adjListRepr, adjMatrixRepr);
-	else if (EdgeList* edgeListRepr = dynamic_cast<EdgeList*>(representation))
+	else if (EdgeList* edgeListRepr = dynamic_cast<EdgeList*>(content))
 		isTransformed = GraphTrasformer::transferContent(edgeListRepr, adjMatrixRepr);
 	if (isTransformed) {
-		delete representation;
-		representation = adjMatrixRepr;
+		delete content;
+		content = adjMatrixRepr;
 	}
 }
 
 void Graph::transformToListOfEdges() {
 	EdgeList * edgeListRepr = new EdgeList();
 	bool isTransformed = false;
-	if (AdjacencyMatrix* adjMatrixRepr = dynamic_cast<AdjacencyMatrix*>(representation))
+	if (AdjacencyMatrix* adjMatrixRepr = dynamic_cast<AdjacencyMatrix*>(content))
 		isTransformed = GraphTrasformer::transferContent(adjMatrixRepr, edgeListRepr);
-	else if (AdjacencyList* adjListRepr = dynamic_cast<AdjacencyList*>(representation))
+	else if (AdjacencyList* adjListRepr = dynamic_cast<AdjacencyList*>(content))
 		isTransformed = GraphTrasformer::transferContent(adjListRepr, edgeListRepr);
 	if (isTransformed) {
-		delete representation;
-		representation = edgeListRepr;
+		delete content;
+		content = edgeListRepr;
 	}
 }
 
 void Graph::writeGraph(const string fileName) {
 	ofstream outFile;
 	outFile.open(fileName);
-	representation->write(outFile);
+	content->write(outFile);
 	outFile.close();
+}
+
+Graph Graph::getSpaingTreePrima() {
+	Graph result(content->vertexCount);
+	if (content->isDirected || !content->isWeighted) 
+		return result; // бессмысленная операция
+	result.content = content->getSpaingTreePrima();
 }

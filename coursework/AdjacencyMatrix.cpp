@@ -5,8 +5,21 @@
 
 AdjacencyMatrix::AdjacencyMatrix() {}
 
+AdjacencyMatrix::AdjacencyMatrix(int vertexCount) {
+	this->vertexCount = vertexCount;
+	adjacencyMatrix.resize(vertexCount);
+	for (int i = 0; i < vertexCount; i++)
+		adjacencyMatrix[i].resize(vertexCount);
+}
 
-AdjacencyMatrix::~AdjacencyMatrix() {}
+
+AdjacencyMatrix::~AdjacencyMatrix() {
+	if (!adjacencyMatrix.empty()) {
+		for (int i = 0; i < adjacencyMatrix.size(); i++)
+			adjacencyMatrix[i].clear();
+		adjacencyMatrix.clear();
+	}
+}
 
 void AdjacencyMatrix::read(istream & inpFile) {
 	int weightFlag;
@@ -55,4 +68,17 @@ void AdjacencyMatrix::removeEdge(int from, int to) {
 	adjacencyMatrix[from][to] = 0;
 	if (!isDirected) // поддержка симметрии матрицы неориентированного графа
 		adjacencyMatrix[to][from] = 0;
+}
+
+GraphContent * AdjacencyMatrix::getSpaingTreePrima() {
+	AdjacencyMatrix* result = new AdjacencyMatrix(this->vertexCount);
+	vector<bool> isMarked;
+	isMarked.resize(vertexCount, false);
+	isMarked[0] = true;
+	//while (/*have unconnected vertice*/) {
+		// попытка добавить ребро в остов
+		// из всех потенциальных рёбер выбирается минимальное
+
+	//}
+	return nullptr;
 }

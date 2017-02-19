@@ -8,6 +8,7 @@ using namespace std;
 class Graph {
 public:
 	Graph();
+	Graph(int vertexCount);
 	~Graph();
 
 	// note: воспримет ориентированный граф без петель и симметричной матрицей как неориентированный
@@ -21,7 +22,10 @@ public:
 	void transformToListOfEdges();
 	void writeGraph(const string fileName);
 
+	Graph getSpaingTreePrima();
+	Graph getSpaingTreeKruscal();
+	Graph getSpaingTreeBoruvka();
 private:
-	GraphContent * representation;
+	GraphContent * content;
 };
 
