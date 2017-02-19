@@ -15,6 +15,10 @@ public:
 	int changeEdge(int from, int to, int newWeight) override;
 	void removeEdge(int from, int to) override;
 
+	GraphContent* getSpaingTreePrima() override;
+	GraphContent* getSpaingTreeKruscal() override;
+	GraphContent* getSpaingTreeBoruvka() override;
+
 private:
 	set<pair<int, int>> edgeList;
 	set<tuple<int, int, int>> weightedEdgeList;

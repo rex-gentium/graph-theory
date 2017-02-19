@@ -15,7 +15,7 @@ AdjacencyMatrix::AdjacencyMatrix(int vertexCount) {
 
 AdjacencyMatrix::~AdjacencyMatrix() {
 	if (!adjacencyMatrix.empty()) {
-		for (int i = 0; i < adjacencyMatrix.size(); i++)
+		for (size_t i = 0; i < adjacencyMatrix.size(); i++)
 			adjacencyMatrix[i].clear();
 		adjacencyMatrix.clear();
 	}
@@ -34,13 +34,17 @@ void AdjacencyMatrix::read(istream & inpFile) {
 	}
 	// проверка на ориентированность
 	this->isDirected = false;
-	for (int from = 0; from < vertexCount; from++)
+	for (int from = 0; from < vertexCount; from++) {
+		if (adjacencyMatrix[from][from] != 0) { // наличие петли — достаточное условие
+			this->isDirected = true;
+			break;
+		}
 		for (int to = from; to < vertexCount; to++)
-			if (adjacencyMatrix[from][to] != 0 || // наличие петли — достаточное условие
-				adjacencyMatrix[from][to] != adjacencyMatrix[to][from]) { // несимметричность — достаточное условие
+			if (adjacencyMatrix[from][to] != adjacencyMatrix[to][from]) { // асимметричность — достаточное условие
 				this->isDirected = true;
 				return; // этот цикл всегда должен стоять последним в методе
 			}
+	}
 }
 
 void AdjacencyMatrix::write(ostream & outFile) {
@@ -72,13 +76,59 @@ void AdjacencyMatrix::removeEdge(int from, int to) {
 
 GraphContent * AdjacencyMatrix::getSpaingTreePrima() {
 	AdjacencyMatrix* result = new AdjacencyMatrix(this->vertexCount);
-	vector<bool> isMarked;
-	isMarked.resize(vertexCount, false);
+	result->isDirected = isDirected;
+	result->isWeighted = isWeighted;
+	bool * isMarked = new bool[vertexCount];
+	for (int i = 0; i < vertexCount; i++)
+		isMarked[i] = false;
+	
 	isMarked[0] = true;
-	//while (/*have unconnected vertice*/) {
-		// попытка добавить ребро в остов
-		// из всех потенциальных рёбер выбирается минимальное
+	bool hasUnmarked = (vertexCount == 1) ? false : true;
+	
+	while (hasUnmarked) {
+		// ищем минимальное из ребёр, соединяющих помеченную вершину i с непомеченной j
+		int minWeight = INT_MAX, minI = -1, minJ = -1;
+		for (int i = 0; i < vertexCount; i++) {
+			if (!isMarked[i]) continue;
+			for (int j = i + 1; j < vertexCount; j++) {
+				if (isMarked[j]) continue;
+				if (adjacencyMatrix[i][j] != 0 && adjacencyMatrix[i][j] < minWeight) {
+					minWeight = adjacencyMatrix[i][j];
+					minI = i;
+					minJ = j;
+				}
+			}
+		}
+		
+		if (minI >= 0) {
+			// нашли ребро
+			result->addEdge(minI, minJ, minWeight);
+			isMarked[minI] = isMarked[minJ] = true;
+		}
+		else { // если не нашли никакого ребра, помечаем любую недостижимую вершину
+			for (int i = 0; i < vertexCount; i++)
+				if (!isMarked[i]) {
+					isMarked[i] = true;
+					break;
+				};
+		}
+		// смотрим, есть ли ещё непомеченные
+		hasUnmarked = false;
+		for (int i = 0; i < vertexCount; i++)
+			if (!isMarked[i]) {
+				hasUnmarked = true;
+				break;
+			}
+	}
 
-	//}
+	delete[] isMarked;
+	return result;
+}
+
+GraphContent * AdjacencyMatrix::getSpaingTreeKruscal() {
+	return nullptr;
+}
+
+GraphContent * AdjacencyMatrix::getSpaingTreeBoruvka() {
 	return nullptr;
 }

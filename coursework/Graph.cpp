@@ -11,10 +11,9 @@
 Graph::Graph() {}
 
 Graph::Graph(int vertexCount) {
-	content = new EdgeList();
+	content = new AdjacencyMatrix(vertexCount);
 	content->isDirected = false;
 	content->isWeighted = true;
-	content->vertexCount = vertexCount;
 }
 
 Graph::~Graph() {}
@@ -109,4 +108,5 @@ Graph Graph::getSpaingTreePrima() {
 	if (content->isDirected || !content->isWeighted) 
 		return result; // бессмысленная операция
 	result.content = content->getSpaingTreePrima();
+	return result;
 }

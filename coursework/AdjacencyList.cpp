@@ -5,6 +5,16 @@
 
 AdjacencyList::AdjacencyList() {}
 
+AdjacencyList::AdjacencyList(int vertexCount, bool isWeigted, bool isDirected) {
+	this->isWeighted = isWeighted;
+	this->isDirected = isDirected;
+	this->vertexCount = vertexCount;
+	if (isWeighted)
+		this->weightedAdjacencyList.resize(vertexCount);
+	else
+		this->adjacencyList.resize(vertexCount);
+}
+
 
 AdjacencyList::~AdjacencyList() {}
 
@@ -131,4 +141,63 @@ void AdjacencyList::removeEdge(int from, int to) {
 				vertexAdjList->erase(it);
 		}
 	}
+}
+
+GraphContent * AdjacencyList::getSpaingTreePrima() {
+	AdjacencyList* result = new AdjacencyList(vertexCount, isWeighted, isDirected);
+	bool * isMarked = new bool[vertexCount];
+	for (int i = 0; i < vertexCount; i++)
+		isMarked[i] = false;
+
+	isMarked[0] = true;
+	bool hasUnmarked = (vertexCount == 1) ? false : true;
+
+	while (hasUnmarked) {
+		// ищем минимальное из ребёр, соединяющих помеченную вершину i с непомеченной j
+		int minWeight = INT_MAX, minI = -1, minJ = -1;
+		for (int i = 0; i < vertexCount; i++) {
+			if (!isMarked[i]) continue;
+			for (const auto & adjacency : weightedAdjacencyList[i]) {
+				int j = adjacency.first;
+				if (isMarked[j]) continue;
+				int weight = adjacency.second;
+				if (weight < minWeight) {
+					minWeight = weight;
+					minI = i;
+					minJ = j;
+				}
+			}
+		}
+
+		if (minI >= 0) {
+			// нашли ребро
+			result->addEdge(minI, minJ, minWeight);
+			isMarked[minI] = isMarked[minJ] = true;
+		}
+		else { // если не нашли никакого ребра, помечаем любую недостижимую вершину
+			for (int i = 0; i < vertexCount; i++)
+				if (!isMarked[i]) {
+					isMarked[i] = true;
+					break;
+				};
+		}
+		// смотрим, есть ли ещё непомеченные
+		hasUnmarked = false;
+		for (int i = 0; i < vertexCount; i++)
+			if (!isMarked[i]) {
+				hasUnmarked = true;
+				break;
+			}
+	}
+
+	delete[] isMarked;
+	return result;
+}
+
+GraphContent * AdjacencyList::getSpaingTreeKruscal() {
+	return nullptr;
+}
+
+GraphContent * AdjacencyList::getSpaingTreeBoruvka() {
+	return nullptr;
 }

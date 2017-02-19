@@ -96,3 +96,61 @@ void EdgeList::removeEdge(int from, int to) {
 			edgeList.erase(make_pair(to, from));
 	}
 }
+
+GraphContent * EdgeList::getSpaingTreePrima() {
+	EdgeList* result = new EdgeList();
+	result->vertexCount = vertexCount;
+	result->isWeighted = isWeighted;
+	result->isDirected = isDirected;
+	bool * isMarked = new bool[vertexCount];
+	for (int i = 0; i < vertexCount; i++)
+		isMarked[i] = false;
+
+	isMarked[0] = true;
+	bool hasUnmarked = (vertexCount == 1) ? false : true;
+
+	while (hasUnmarked) {
+		// ищем минимальное из ребёр, соединяющих помеченную вершину с непомеченной
+		int minWeight = INT_MAX, minI = -1, minJ = -1;
+		for (const auto & edge : weightedEdgeList) {
+			int i = get<0>(edge);
+			int j = get<1>(edge);
+			if (isMarked[i] == isMarked[j]) continue;
+			int weight = get<2>(edge);
+			if (weight < minWeight) {
+				minWeight = weight;
+				minI = i;
+				minJ = j;
+			}
+		}
+		if (minI >= 0) { // нашли ребро
+			result->addEdge(minI, minJ, minWeight);
+			isMarked[minI] = isMarked[minJ] = true;
+		}
+		else { // если не нашли никакого ребра, помечаем любую недостижимую вершину
+			for (int i = 0; i < vertexCount; i++)
+				if (!isMarked[i]) {
+					isMarked[i] = true;
+					break;
+				};
+		}
+		// смотрим, есть ли ещё непомеченные
+		hasUnmarked = false;
+		for (int i = 0; i < vertexCount; i++)
+			if (!isMarked[i]) {
+				hasUnmarked = true;
+				break;
+			}
+	}
+
+	delete[] isMarked;
+	return result;
+}
+
+GraphContent * EdgeList::getSpaingTreeKruscal() {
+	return nullptr;
+}
+
+GraphContent * EdgeList::getSpaingTreeBoruvka() {
+	return nullptr;
+}
