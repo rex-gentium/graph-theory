@@ -7,6 +7,7 @@ using namespace std;
 class AdjacencyMatrix : 
 	public GraphContent {
 	friend class GraphTrasformer;
+	friend class Algorithm;
 public:
 	AdjacencyMatrix();
 	AdjacencyMatrix(int vertexCount); 
@@ -17,10 +18,6 @@ public:
 	void addEdge(int from, int to, int weight) override;
 	int changeEdge(int from, int to, int newWeight) override;
 	void removeEdge(int from, int to) override;
-
-	GraphContent* getSpaingTreePrima() override;
-	GraphContent* getSpaingTreeKruscal() override;
-	GraphContent* getSpaingTreeBoruvka() override;
 
 private:
 	vector<vector<int>> adjacencyMatrix;
