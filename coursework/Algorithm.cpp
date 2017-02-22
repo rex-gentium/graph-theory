@@ -152,3 +152,8 @@ EdgeList * Algorithm::getSpaingTreePrima(const EdgeList * graph) {
 	delete[] isMarked;
 	return result;
 }
+
+EdgeList * Algorithm::getSpaingTreeKruscal(const EdgeList * graph) {
+	// сортировка рёбер
+	return nullptr;
+}
