@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "GraphContent.h"
 #include <set>
+#include <list>
 
 class EdgeList :
 	public GraphContent {
@@ -15,6 +16,8 @@ public:
 	void addEdge(int from, int to, int weight) override;
 	int changeEdge(int from, int to, int newWeight) override;
 	void removeEdge(int from, int to) override;
+
+	list<tuple<int, int, int>> getEdgesList() const;
 
 private:
 	set<pair<int, int>> edgeList;

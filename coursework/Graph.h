@@ -7,6 +7,7 @@ using namespace std;
 
 class Graph {
 public:
+	enum RepresentationType { NONE, ADJMATRIX, ADJLIST, EDGELIST };
 	Graph();
 	Graph(int vertexCount);
 	~Graph();
@@ -27,5 +28,6 @@ public:
 	Graph getSpaingTreeBoruvka();
 private:
 	GraphContent * content;
+	RepresentationType currentRepr;
 };
 

@@ -1,10 +1,7 @@
 ﻿#include "EdgeList.h"
 #include <tuple>
 
-
-
 EdgeList::EdgeList() {}
-
 
 EdgeList::~EdgeList() {}
 
@@ -95,4 +92,8 @@ void EdgeList::removeEdge(int from, int to) {
 		if (!isDirected)
 			edgeList.erase(make_pair(to, from));
 	}
+}
+
+list<tuple<int, int, int>> EdgeList::getEdgesList() const {
+	return list<tuple<int, int, int>>(weightedEdgeList.cbegin(), weightedEdgeList.cend());
 }

@@ -1,4 +1,5 @@
 ﻿#include "Algorithm.h"
+#include "DSU.h"
 #include <tuple>
 
 AdjacencyMatrix * Algorithm::getSpaingTreePrima(const AdjacencyMatrix * graph) {
@@ -153,7 +154,34 @@ EdgeList * Algorithm::getSpaingTreePrima(const EdgeList * graph) {
 	return result;
 }
 
+bool compareWeight(const tuple<int, int, int> leftEdge, const tuple<int, int, int> rightEdge) {
+	return get<2>(leftEdge) < get<2>(rightEdge);
+}
+
 EdgeList * Algorithm::getSpaingTreeKruscal(const EdgeList * graph) {
-	// сортировка рёбер
-	return nullptr;
+	EdgeList* result = new EdgeList();
+	result->isDirected = graph->isDirected;
+	result->isWeighted = graph->isWeighted;
+	result->vertexCount = graph->vertexCount;
+	// сортировка рёбер n*log(n)
+	list<tuple<int, int, int>> edges = graph->getEdgesList();
+	edges.sort(compareWeight);
+	// распределение по компонентам связности
+	DSU unityComponents(edges.size());
+	while (!edges.empty()) {
+		auto edge = edges.front();
+		int from = get<0>(edge);
+		int to = get<1>(edge);
+		int weight = get<2>(edge);
+		int leftUnityComponent = unityComponents.find(from);
+		int rightUnityComponent = unityComponents.find(to);
+		if (leftUnityComponent != rightUnityComponent) {
+			// добавление ребра не образует цикл
+			result->addEdge(to, from, weight);
+			unityComponents.unite(leftUnityComponent, rightUnityComponent);
+		}
+		// если добавление ребра образует цикл, оно непригодно для постройки остова
+		edges.pop_front();
+	}
+	return result;
 }
