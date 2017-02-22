@@ -145,6 +145,7 @@
     <ClInclude Include="AdjacencyList.h" />
     <ClInclude Include="AdjacencyMatrix.h" />
     <ClInclude Include="Algorithm.h" />
+    <ClInclude Include="DSU.h" />
     <ClInclude Include="EdgeList.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="GraphContent.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="AdjacencyList.cpp" />
     <ClCompile Include="AdjacencyMatrix.cpp" />
     <ClCompile Include="Algorithm.cpp" />
+    <ClCompile Include="DSU.cpp" />
     <ClCompile Include="EdgeList.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="GraphContent.cpp" />
