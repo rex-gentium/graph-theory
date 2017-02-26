@@ -73,3 +73,13 @@ void AdjacencyMatrix::removeEdge(int from, int to) {
 	if (!isDirected) // поддержка симметрии матрицы неориентированного графа
 		adjacencyMatrix[to][from] = 0;
 }
+
+list<tuple<int, int, int>> AdjacencyMatrix::getEdgesList() const
+{
+	list<tuple<int, int, int>> result;
+	for (int i = 0; i < vertexCount; ++i)
+		for (int j = (isDirected ? 0 : i + 1); j < vertexCount; ++j) {
+		
+		}
+	return result;
+}
