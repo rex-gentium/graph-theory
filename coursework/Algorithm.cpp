@@ -167,7 +167,7 @@ EdgeList * Algorithm::getSpaingTreeKruscal(const GraphContent * graph) {
 	list<tuple<int, int, int>> edges = graph->getEdgesList();
 	edges.sort(compareWeight);
 	// распределение по компонентам связности
-	DSU unityComponents(edges.size());
+	DSU unityComponents(graph->vertexCount);
 	while (!edges.empty()) {
 		auto edge = edges.front();
 		int from = get<0>(edge);
@@ -184,4 +184,23 @@ EdgeList * Algorithm::getSpaingTreeKruscal(const GraphContent * graph) {
 		edges.pop_front();
 	}
 	return result;
+}
+
+EdgeList * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
+{
+	EdgeList * result = new EdgeList();
+	result->isDirected = graph->isDirected;
+	result->isWeighted = graph->isWeighted;
+	result->vertexCount = graph->vertexCount;
+
+	auto edges = graph->getEdgesList();
+	DSU unityComponents(graph->vertexCount);
+	while (unityComponents.getSetCount() > 1) {
+		// для каждой компоненты связности графа
+		for (auto comp = unityComponents.begin(); comp != unityComponents.end(); ++comp) {
+
+		}
+		set<tuple<int, int, int>> edgesToAdd;
+	}
+	return nullptr;
 }

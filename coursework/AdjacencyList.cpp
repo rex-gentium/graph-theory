@@ -142,3 +142,8 @@ void AdjacencyList::removeEdge(int from, int to) {
 		}
 	}
 }
+
+list<tuple<int, int, int>> AdjacencyList::getEdgesList() const
+{
+	return list<tuple<int, int, int>>();
+}
