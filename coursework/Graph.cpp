@@ -133,3 +133,12 @@ Graph Graph::getSpaingTreePrima() {
 	}
 	return result;
 }
+
+Graph Graph::getSpaingTreeKruscal()
+{
+	Graph result(content->vertexCount);
+	if (content->isDirected || !content->isWeighted)
+		return result; // бессмысленная операция
+	result.content = Algorithm::getSpaingTreeKruscal(this->content);
+	return result;
+}

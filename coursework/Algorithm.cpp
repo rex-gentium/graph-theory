@@ -158,12 +158,12 @@ bool compareWeight(const tuple<int, int, int> leftEdge, const tuple<int, int, in
 	return get<2>(leftEdge) < get<2>(rightEdge);
 }
 
-EdgeList * Algorithm::getSpaingTreeKruscal(const EdgeList * graph) {
+EdgeList * Algorithm::getSpaingTreeKruscal(const GraphContent * graph) {
 	EdgeList* result = new EdgeList();
 	result->isDirected = graph->isDirected;
 	result->isWeighted = graph->isWeighted;
 	result->vertexCount = graph->vertexCount;
-	// сортировка рёбер n*log(n)
+	// сортировка рёбер e*log(e)
 	list<tuple<int, int, int>> edges = graph->getEdgesList();
 	edges.sort(compareWeight);
 	// распределение по компонентам связности

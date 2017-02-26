@@ -9,6 +9,6 @@ public:
 	static AdjacencyList* getSpaingTreePrima(const AdjacencyList * graph);		// O(v^2)
 	static EdgeList* getSpaingTreePrima(const EdgeList * graph);				// O(e)
 
-	static EdgeList* getSpaingTreeKruscal(const EdgeList * graph);				// O(e*Akkerman(e))
+	static EdgeList* getSpaingTreeKruscal(const GraphContent * graph);				// O(e*log(e))
 };
 
