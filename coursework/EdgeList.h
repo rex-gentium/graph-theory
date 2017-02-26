@@ -17,7 +17,8 @@ public:
 	int changeEdge(int from, int to, int newWeight) override;
 	void removeEdge(int from, int to) override;
 
-	list<tuple<int, int, int>> getEdgesList() const override;
+	list<tuple<int, int, int>> getWeightedEdgesList() const override;
+	set<pair<int, int>> getWeightedAdjacencies(int vertex) const override;
 
 private:
 	set<pair<int, int>> edgeList;

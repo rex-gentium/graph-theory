@@ -94,6 +94,11 @@ void EdgeList::removeEdge(int from, int to) {
 	}
 }
 
-list<tuple<int, int, int>> EdgeList::getEdgesList() const {
+list<tuple<int, int, int>> EdgeList::getWeightedEdgesList() const {
 	return list<tuple<int, int, int>>(weightedEdgeList.cbegin(), weightedEdgeList.cend());
+}
+
+set<pair<int, int>> EdgeList::getWeightedAdjacencies(int vertex) const
+{
+	return set<pair<int, int>>();
 }

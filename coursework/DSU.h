@@ -44,6 +44,7 @@ public:
 			DSIterator& operator++();
 			bool operator==(const DSIterator& that);
 			bool operator!=(const DSIterator& that);
+			int operator*();
 		};
 		DSIterator begin() const;
 		DSIterator end() const;

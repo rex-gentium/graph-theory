@@ -74,12 +74,22 @@ void AdjacencyMatrix::removeEdge(int from, int to) {
 		adjacencyMatrix[to][from] = 0;
 }
 
-list<tuple<int, int, int>> AdjacencyMatrix::getEdgesList() const
+list<tuple<int, int, int>> AdjacencyMatrix::getWeightedEdgesList() const
 {
 	list<tuple<int, int, int>> result;
 	for (int i = 0; i < vertexCount; ++i)
 		for (int j = (isDirected ? 0 : i + 1); j < vertexCount; ++j) {
-		
+			if (adjacencyMatrix[i][j])
+				result.push_back(make_tuple(i, j, adjacencyMatrix[i][j]));
 		}
+	return result;
+}
+
+set<pair<int, int>> AdjacencyMatrix::getWeightedAdjacencies(int vertex) const
+{
+	set<pair<int, int>> result;
+	for (int j = 0; j < adjacencyMatrix[vertex].size(); ++j)
+		if (adjacencyMatrix[vertex][j])
+			result.insert(make_pair(j, adjacencyMatrix[vertex][j]));
 	return result;
 }

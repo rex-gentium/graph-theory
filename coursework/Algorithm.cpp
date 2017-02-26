@@ -164,7 +164,7 @@ EdgeList * Algorithm::getSpaingTreeKruscal(const GraphContent * graph) {
 	result->isWeighted = graph->isWeighted;
 	result->vertexCount = graph->vertexCount;
 	// сортировка рёбер e*log(e)
-	list<tuple<int, int, int>> edges = graph->getEdgesList();
+	list<tuple<int, int, int>> edges = graph->getWeightedEdgesList();
 	edges.sort(compareWeight);
 	// распределение по компонентам связности
 	DSU unityComponents(graph->vertexCount);
@@ -193,14 +193,28 @@ EdgeList * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 	result->isWeighted = graph->isWeighted;
 	result->vertexCount = graph->vertexCount;
 
-	auto edges = graph->getEdgesList();
+	auto edges = graph->getWeightedEdgesList();
 	DSU unityComponents(graph->vertexCount);
 	while (unityComponents.getSetCount() > 1) {
-		// для каждой компоненты связности графа
-		for (auto comp = unityComponents.begin(); comp != unityComponents.end(); ++comp) {
-
-		}
+		// на каждой итерации будем добавлять по нескольку связующих ребёр
 		set<tuple<int, int, int>> edgesToAdd;
+		// для каждой компоненты связности графа ищем минимальное ребро, соединяющее её с другой
+		for (auto component = unityComponents.begin(); component != unityComponents.end(); ++component) {
+			tuple<int, int, int> min = {-1,-1, INT_MAX};
+			// для этого для каждой вершины компоненты просматриваем доступные рёбра
+			for (auto vertex = component.begin(); vertex != component.end(); ++vertex) {
+				graph->getWeightedAdjacencies(*vertex); // O(1) for adjlist, O(
+			}
+		}
+		if (edgesToAdd.empty())
+			break; // случай, когда в остове несколько компонент связности
+		else {
+			for (auto & edge : edgesToAdd) {
+				int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
+				result->addEdge(from, to, weight);
+				unityComponents.unite(from, to);
+			}
+		}
 	}
 	return nullptr;
 }

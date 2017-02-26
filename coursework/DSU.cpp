@@ -98,3 +98,8 @@ bool DSU::DSUIterator::DSIterator::operator!=(const DSIterator & that)
 {
 	return !this->operator==(that);
 }
+
+int DSU::DSUIterator::DSIterator::operator*()
+{
+	return currentElement;
+}

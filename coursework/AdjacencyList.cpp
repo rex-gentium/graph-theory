@@ -143,7 +143,12 @@ void AdjacencyList::removeEdge(int from, int to) {
 	}
 }
 
-list<tuple<int, int, int>> AdjacencyList::getEdgesList() const
+list<tuple<int, int, int>> AdjacencyList::getWeightedEdgesList() const
 {
 	return list<tuple<int, int, int>>();
+}
+
+set<pair<int, int>> AdjacencyList::getWeightedAdjacencies(int vertex) const
+{
+	return weightedAdjacencyList[vertex];
 }
