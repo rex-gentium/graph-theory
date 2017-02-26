@@ -3,11 +3,18 @@
 
 
 DSU::DSU(int setCount) {
-	forest.resize(setCount);
+	this->setCount = size = setCount;
+	parent = new int[setCount];
+	rank = new int[setCount];
+	for (int i = 0; i < size; ++i) {
+		parent[i] = i;
+		rank[i] = 0;
+	}
 }
 
 DSU::~DSU() {
-	forest.clear();
+	delete[] parent;
+	delete[] rank;
 }
 
 void DSU::unite(int x, int y) {
@@ -16,15 +23,15 @@ void DSU::unite(int x, int y) {
 	y = find(y);
 	if (x == y) return;
 	// меньшее дерево X, большее Y
-	if (forest[x].rank > forest[y].rank) std::swap(x, y);
-	
-	forest[x].parent = y;
-	if (forest[y].rank == 0) // высота может измениться
-		forest[y].rank++;
+	if (rank[x] > rank[y])
+		std::swap(x, y);
+	parent[x] = y;
+	if (rank[x] == rank[y]) // высота может измениться
+		rank[y]++;
 }
 
 int DSU::find(int x) const {
-	while (forest[x].parent != -1)
-		x = forest[x].parent;
-	return x;
+	if (x == parent[x])
+		return x;
+	return parent[x] = find(parent[x]);
 }
