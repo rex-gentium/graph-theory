@@ -142,3 +142,12 @@ Graph Graph::getSpaingTreeKruscal()
 	result.content = Algorithm::getSpaingTreeKruscal(this->content);
 	return result;
 }
+
+Graph Graph::getSpaingTreeBoruvka()
+{
+	Graph result(content->vertexCount);
+	if (content->isDirected || !content->isWeighted)
+		return result; // бессмысленная операция
+	result.content = Algorithm::getSpaingTreeBoruvka(this->content);
+	return result;
+}

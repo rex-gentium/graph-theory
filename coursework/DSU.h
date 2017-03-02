@@ -26,32 +26,6 @@ public:
 	int find(int x) const;
 	/* возвращает количество множеств */
 	int getSetCount() const { return setCount; }
-	
-	/* итераторная часть */
-	static class DSUIterator {
-		const DSU * masterUnion;
-		int currentSet;
-	public:
-		DSUIterator(const DSU * u, int value);
-		DSUIterator& operator++();
-		bool operator==(const DSUIterator& that);
-		bool operator!=(const DSUIterator& that);
-		static class DSIterator {
-			const DSUIterator * masterSet;
-			int currentElement;
-		public:
-			DSIterator(const DSUIterator * s, int value);
-			DSIterator& operator++();
-			bool operator==(const DSIterator& that);
-			bool operator!=(const DSIterator& that);
-			int operator*();
-		};
-		DSIterator begin() const;
-		DSIterator end() const;
-
-	};
-	DSUIterator begin() const { return *(new DSUIterator(this, 0)); }
-	DSUIterator end() const { return *(new DSUIterator(this, -1)); }
 
 private:
 	int * parent;

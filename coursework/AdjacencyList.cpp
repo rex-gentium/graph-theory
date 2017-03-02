@@ -145,10 +145,13 @@ void AdjacencyList::removeEdge(int from, int to) {
 
 list<tuple<int, int, int>> AdjacencyList::getWeightedEdgesList() const
 {
-	return list<tuple<int, int, int>>();
-}
-
-set<pair<int, int>> AdjacencyList::getWeightedAdjacencies(int vertex) const
-{
-	return weightedAdjacencyList[vertex];
+	list<tuple<int, int, int>> result;
+	for (int from = 0; from < weightedAdjacencyList.size(); ++from)
+		for (const auto & adjacency : weightedAdjacencyList[from]) {
+			int to = adjacency.first;
+			int weight = adjacency.second;
+			if (isDirected || from <= to) // избегаем дублей в неориентированном графе
+				result.push_back(make_tuple(from, to, weight));
+		}
+	return result;
 }

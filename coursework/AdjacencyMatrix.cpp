@@ -84,12 +84,3 @@ list<tuple<int, int, int>> AdjacencyMatrix::getWeightedEdgesList() const
 		}
 	return result;
 }
-
-set<pair<int, int>> AdjacencyMatrix::getWeightedAdjacencies(int vertex) const
-{
-	set<pair<int, int>> result;
-	for (int j = 0; j < adjacencyMatrix[vertex].size(); ++j)
-		if (adjacencyMatrix[vertex][j])
-			result.insert(make_pair(j, adjacencyMatrix[vertex][j]));
-	return result;
-}

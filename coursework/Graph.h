@@ -25,7 +25,7 @@ public:
 
 	Graph getSpaingTreePrima();
 	Graph getSpaingTreeKruscal();
-	//Graph getSpaingTreeBoruvka();
+	Graph getSpaingTreeBoruvka();
 private:
 	GraphContent * content;
 	RepresentationType currentRepr;

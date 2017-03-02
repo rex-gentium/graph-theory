@@ -28,6 +28,7 @@ void DSU::unite(int x, int y) {
 	parent[x] = y;
 	if (rank[x] == rank[y]) // высота может измениться
 		rank[y]++;
+	--setCount;
 }
 
 int DSU::find(int x) const {
@@ -36,70 +37,4 @@ int DSU::find(int x) const {
 	if (x == parent[x])
 		return x;
 	return parent[x] = find(parent[x]);
-}
-
-DSU::DSUIterator::DSUIterator(const DSU * u, int value)
-{
-	this->masterUnion = u;
-	this->currentSet = value;
-}
-
-DSU::DSUIterator & DSU::DSUIterator::operator++()
-{
-	while (++currentSet < masterUnion->size)
-		if (masterUnion->find(currentSet) == currentSet)
-			return *this;
-	return masterUnion->end();
-}
-
-bool DSU::DSUIterator::operator==(const DSUIterator & that)
-{
-	return (this->masterUnion == that.masterUnion && this->currentSet == that.currentSet);
-}
-
-bool DSU::DSUIterator::operator!=(const DSUIterator & that)
-{
-	return !this->operator==(that);
-}
-
-DSU::DSUIterator::DSIterator DSU::DSUIterator::begin() const
-{
-	for (int i = 0; i < masterUnion->size; ++i)
-		if (masterUnion->find(i) == currentSet)
-			return DSIterator(this, i);
-	return this->end();
-}
-
-DSU::DSUIterator::DSIterator DSU::DSUIterator::end() const
-{
-	return *(new DSIterator(this, -1));
-}
-
-DSU::DSUIterator::DSIterator::DSIterator(const DSUIterator * s, int value)
-{
-	this->masterSet = s;
-	this->currentElement = value;
-}
-
-DSU::DSUIterator::DSIterator & DSU::DSUIterator::DSIterator::operator++()
-{
-	while (++currentElement < masterSet->masterUnion->size)
-		if (masterSet->masterUnion->find(currentElement) == masterSet->currentSet)
-			return *this;
-	return masterSet->end();
-}
-
-bool DSU::DSUIterator::DSIterator::operator==(const DSIterator & that)
-{
-	return (this->masterSet == that.masterSet && this->currentElement == that.currentElement);
-}
-
-bool DSU::DSUIterator::DSIterator::operator!=(const DSIterator & that)
-{
-	return !this->operator==(that);
-}
-
-int DSU::DSUIterator::DSIterator::operator*()
-{
-	return currentElement;
 }

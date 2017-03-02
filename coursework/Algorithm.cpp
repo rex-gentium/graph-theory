@@ -163,8 +163,9 @@ EdgeList * Algorithm::getSpaingTreeKruscal(const GraphContent * graph) {
 	result->isDirected = graph->isDirected;
 	result->isWeighted = graph->isWeighted;
 	result->vertexCount = graph->vertexCount;
+	
+	list<tuple<int, int, int>> edges = graph->getWeightedEdgesList(); // O(e*v) for adjlist, O(v^2) for adjmatrix, O(e) for edgelist
 	// сортировка рёбер e*log(e)
-	list<tuple<int, int, int>> edges = graph->getWeightedEdgesList();
 	edges.sort(compareWeight);
 	// распределение по компонентам связности
 	DSU unityComponents(graph->vertexCount);
@@ -188,33 +189,43 @@ EdgeList * Algorithm::getSpaingTreeKruscal(const GraphContent * graph) {
 
 EdgeList * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 {
-	EdgeList * result = new EdgeList();
+	EdgeList * result = new EdgeList;
 	result->isDirected = graph->isDirected;
 	result->isWeighted = graph->isWeighted;
 	result->vertexCount = graph->vertexCount;
 
-	auto edges = graph->getWeightedEdgesList();
 	DSU unityComponents(graph->vertexCount);
+	auto edges = graph->getWeightedEdgesList();
+	vector<tuple<int, int, int>> edgesToAdd;
+	
 	while (unityComponents.getSetCount() > 1) {
-		// на каждой итерации будем добавлять по нескольку связующих ребёр
-		set<tuple<int, int, int>> edgesToAdd;
-		// для каждой компоненты связности графа ищем минимальное ребро, соединяющее её с другой
-		for (auto component = unityComponents.begin(); component != unityComponents.end(); ++component) {
-			tuple<int, int, int> min = {-1,-1, INT_MAX};
-			// для этого для каждой вершины компоненты просматриваем доступные рёбра
-			for (auto vertex = component.begin(); vertex != component.end(); ++vertex) {
-				graph->getWeightedAdjacencies(*vertex); // O(1) for adjlist, O(
+		// на каждой итерации будем добавлять к каждой из компонент по ребру
+		edgesToAdd.resize(graph->vertexCount, make_tuple(-1, -1, INT_MAX));
+		// для ищем среди ребер минимальные, связующие разные компоненты
+		for (auto & edge : edges) {
+			int from = get<0>(edge);
+			int to = get<1>(edge);
+			int weight = get<2>(edge);
+			int fromComponent = unityComponents.find(from);
+			int toComponent = unityComponents.find(to);
+			if (fromComponent != toComponent) {
+				if (weight < get<2>(edgesToAdd[fromComponent]))
+					edgesToAdd[fromComponent] = make_tuple(from, to, weight);
+				if (weight < get<2>(edgesToAdd[toComponent]))
+					edgesToAdd[toComponent] = make_tuple(from, to, weight);
 			}
 		}
-		if (edgesToAdd.empty())
+		bool didEdgeAdding = false;
+		for (auto & edge : edgesToAdd) {
+			int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
+			if (from < 0 || to < 0) continue;
+			result->addEdge(from, to, weight);
+			unityComponents.unite(from, to);
+			didEdgeAdding = true;
+		}
+		if (!didEdgeAdding)
 			break; // случай, когда в остове несколько компонент связности
-		else {
-			for (auto & edge : edgesToAdd) {
-				int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
-				result->addEdge(from, to, weight);
-				unityComponents.unite(from, to);
-			}
-		}
+		edgesToAdd.clear();
 	}
-	return nullptr;
+	return result;
 }
