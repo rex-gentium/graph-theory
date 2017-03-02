@@ -155,3 +155,22 @@ list<tuple<int, int, int>> AdjacencyList::getWeightedEdgesList() const
 		}
 	return result;
 }
+
+tuple<int, int, int> AdjacencyList::findMinEdge(bool * isMarked) const
+{
+	int minWeight = INT_MAX, minI = -1, minJ = -1;
+	for (int i = 0; i < vertexCount; i++) {
+		if (!isMarked[i]) continue;
+		for (const auto & adjacency : weightedAdjacencyList[i]) {
+			int j = adjacency.first;
+			if (isMarked[j]) continue;
+			int weight = adjacency.second;
+			if (weight < minWeight) {
+				minWeight = weight;
+				minI = i;
+				minJ = j;
+			}
+		}
+	}
+	return make_tuple(minI, minJ, minWeight);
+}

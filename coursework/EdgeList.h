@@ -17,8 +17,10 @@ public:
 	int changeEdge(int from, int to, int newWeight) override;
 	void removeEdge(int from, int to) override;
 
-	/* O(e) ~ O(1) */
+	/* O(e) */
 	list<tuple<int, int, int>> getWeightedEdgesList() const override;
+	/* O(e) */
+	tuple<int, int, int> findMinEdge(bool * isMarked) const override;
 
 private:
 	set<pair<int, int>> edgeList;

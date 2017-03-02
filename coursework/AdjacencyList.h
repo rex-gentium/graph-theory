@@ -20,6 +20,8 @@ public:
 
 	/* O(v*min(e, v)) ~ O(v^2) */
 	list<tuple<int, int, int>> getWeightedEdgesList() const override;
+	/* O(v*e) */
+	tuple<int, int, int> findMinEdge(bool * isMarked) const override;
 
 private:
 	vector<set<int>> adjacencyList;

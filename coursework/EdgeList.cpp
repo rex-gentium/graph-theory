@@ -97,3 +97,20 @@ void EdgeList::removeEdge(int from, int to) {
 list<tuple<int, int, int>> EdgeList::getWeightedEdgesList() const {
 	return list<tuple<int, int, int>>(weightedEdgeList.cbegin(), weightedEdgeList.cend());
 }
+
+tuple<int, int, int> EdgeList::findMinEdge(bool * isMarked) const
+{
+	int minWeight = INT_MAX, minI = -1, minJ = -1;
+	for (const auto & edge : weightedEdgeList) {
+		int i = get<0>(edge);
+		int j = get<1>(edge);
+		if (isMarked[i] == isMarked[j]) continue;
+		int weight = get<2>(edge);
+		if (weight < minWeight) {
+			minWeight = weight;
+			minI = i;
+			minJ = j;
+		}
+	}
+	return make_tuple(minI, minJ, minWeight);
+}

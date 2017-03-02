@@ -126,11 +126,7 @@ Graph Graph::getSpaingTreePrima() {
 	Graph result(content->vertexCount);
 	if (content->isDirected || !content->isWeighted) 
 		return result; // бессмысленная операция
-	switch (currentRepr) {
-	case ADJMATRIX: result.content = Algorithm::getSpaingTreePrima(dynamic_cast<AdjacencyMatrix*>(content));
-	case ADJLIST: result.content = Algorithm::getSpaingTreePrima(dynamic_cast<AdjacencyList*>(content));
-	case EDGELIST: result.content = Algorithm::getSpaingTreePrima(dynamic_cast<EdgeList*>(content));
-	}
+	result.content = Algorithm::getSpaingTreePrima(this->content);
 	return result;
 }
 
