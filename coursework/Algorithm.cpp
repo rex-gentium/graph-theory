@@ -120,35 +120,66 @@ GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 
 bool Algorithm::checkEuler(const GraphContent * graph, bool & isCircleExists, int & tourStart)
 {
-	//считаем количество вершин с нечётной степенью
-	int oddDegreeVertexCount = 0;
-	vector<int> degrees = graph->getVerticesDegrees(); // O(v^2) for AdjMatrix, O(v*log(v)) for AdjList, O(e) for EdgeList
-	for (int v = 0; v < graph->vertexCount; ++v)
-		if (degrees[v] % 2 != 0) {
-			tourStart = v;
-			if (++oddDegreeVertexCount > 2)
-				return false;	// граф вообще не является эйлеровым
+	bool result = checkEulerDegrees(graph, isCircleExists, tourStart);
+	if (result == true) {
+		// число компонент [слабой] связности, имеющих рёбра, не должно быть больше 1
+		DSU unityComponents = graph->getUnityComponents();
+		if (unityComponents.getSetCount() == 1)
+			return true;
+		int connectedComponent = -1; // запомним ту компоненту, которой можно иметь ребра
+		for (int v = 0; v < graph->vertexCount; ++v) {
+			int leader = unityComponents.find(v);
+			if (leader != v)
+				// вершина не является лидером компоненты, значит связана ребрами с лидером
+				if (connectedComponent < 0)
+					connectedComponent = leader;
+				else if (connectedComponent != leader)
+					return false;
 		}
-	// в графе есть эйлеров цикл, если все вершины чётной степени
-	isCircleExists = oddDegreeVertexCount == 0;
-	// в графе есть эйлеров путь, если вершин нечётной степени 0 или 2
-	if (oddDegreeVertexCount == 1)
-		return false;
-	
-	// число компонент связности, имеющих рёбра, не должно быть больше 1
-	DSU unityComponents = graph->getUnityComponents();
-	if (unityComponents.getSetCount() == 1)
-		return true;
-	int connectedComponent = -1; // запомним ту единственную компоненту, которой можно иметь ребра
-	for (int v = 0; v < graph->vertexCount; ++v) {
-		int leader = unityComponents.find(v);
-		if (leader != v)
-			// вершина не является лидером компоненты, значит связана ребрами с лидером
-			if (connectedComponent < 0)
-				connectedComponent = leader;
-			else if (connectedComponent != leader)
-				return false;
 	}
+	return result;
+}
 
-	return true;
+bool Algorithm::checkEulerDegrees(const GraphContent * graph, bool & isCircleExists, int & tourStart)
+{
+	int tourFinish = tourStart = -1;
+	if (graph->isDirected) {
+		// неорграф является эйлеровым, если в нём 0 или 2 вершины нечётной степени
+		vector<int> degrees = graph->getVerticesDegrees(); // O(v^2) for AdjMatrix, O(v*log(v)) for AdjList, O(e) for EdgeList
+		for (int v = 0; v < graph->vertexCount; ++v)
+			if (degrees[v] % 2 != 0) {
+				if (tourStart < 0)
+					tourStart = v;
+				else if (tourFinish < 0)
+					tourFinish = v;
+				else return false;
+			}
+	}
+	else {
+		// орграф является эйлеровым, если полустепени захода равны полустепеням исхода у всех вершин,
+		// кроме, может быть, двух: одна должна иметь бОльшую (на 1) степень исхода, вторая бОльшую (на 1) степень захода
+		int tourFinish = tourStart = -1;
+		vector<int> inDegrees = graph->getVerticesInDegrees(); // O(v^2) for AdjMatrix, AdjList, O(e) for EdgeList
+		vector<int> outDegrees = graph->getVerticesOutDegrees(); // O(v^2) for AdjMatrix, O(v) for AdjList, O(e) for EdgeList
+		for (int v = 0; v < graph->vertexCount; ++v) {
+			int sub = inDegrees[v] - outDegrees[v];
+			switch (sub) {
+			case 1:
+				if (tourStart >= 0) return false;
+				else tourStart == v;
+				break;
+			case 0: break;
+			case -1:
+				if (tourFinish >= 0) return false;
+				else tourFinish == v;
+				break;
+			default: return false;
+			}
+		}
+	}
+	// в графе есть эйлеров цикл, если все вершины чётной степени
+	isCircleExists = (tourStart < 0 && tourFinish < 0);
+	// в графе есть эйлеров путь, если есть 2 вышеуказанных вершины
+	if (tourStart < 0 != tourFinish < 0) // tourStartExists XOR tourFinishExists
+		return false;
 }

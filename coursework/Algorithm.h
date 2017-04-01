@@ -13,5 +13,7 @@ public:
 	static bool checkEuler(const GraphContent * graph, bool & isCircleExists, int & tourStart);
 	static vector<int> getEuleranTour(const GraphContent * graph);
 	static vector<int> getEuleranTourFleri(const GraphContent * graph);
+private:
+	static bool checkEulerDegrees(const GraphContent * graph, bool & isCircleExists, int & tourStart);
 };
 

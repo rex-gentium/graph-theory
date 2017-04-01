@@ -40,7 +40,7 @@ public:
 	virtual vector<int> getVerticesInDegrees() const = 0;
 	/* возвращает массив полустепеней исходов вершин */
 	virtual vector<int> getVerticesOutDegrees() const = 0;
-	/* возвращает компоненты связности в виде системы непересекающихся множеств */
+	/* возвращает компоненты [слабой] связности в виде системы непересекающихся множеств */
 	virtual DSU getUnityComponents() const = 0;
 };
 
