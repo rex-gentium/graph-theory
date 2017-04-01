@@ -160,3 +160,13 @@ vector<int> AdjacencyMatrix::getVerticesOutDegrees() const
 		outDegrees[v] = getVertexOutDegree(v);
 	return outDegrees;
 }
+
+DSU AdjacencyMatrix::getUnityComponents() const
+{
+	DSU result(vertexCount);
+	for (int from = 0; from < vertexCount; ++from)
+		for (int to = (isDirected) ? from : 0; to < vertexCount; ++to)
+			if (adjacencyMatrix[from][to])
+				result.unite(from, to);
+	return result;
+}

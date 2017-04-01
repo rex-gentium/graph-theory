@@ -30,6 +30,8 @@ public:
 	vector<int> getVerticesInDegrees() const override;	// O(e)
 	vector<int> getVerticesOutDegrees() const override;	// O(e)
 
+	DSU getUnityComponents() const override; // O(e)
+
 private:
 	set<pair<int, int>> edgeList;
 	set<tuple<int, int, int>> weightedEdgeList;

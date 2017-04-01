@@ -243,3 +243,17 @@ vector<int> AdjacencyList::getVerticesOutDegrees() const
 		outDegrees[v] = getVertexOutDegree(v);
 	return outDegrees;
 }
+
+DSU AdjacencyList::getUnityComponents() const
+{
+	DSU result(vertexCount);
+	if (isWeighted)
+		for (int from = 0; from < vertexCount; ++from)
+			for (const auto & adjacency : weightedAdjacencyList[from])
+				result.unite(from, adjacency.first);
+	else
+		for (int from = 0; from < vertexCount; ++from)
+			for (const auto & to : adjacencyList[from])
+				result.unite(from, to);
+	return result;
+}

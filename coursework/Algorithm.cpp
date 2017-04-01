@@ -122,7 +122,7 @@ bool Algorithm::checkEuler(const GraphContent * graph, bool & isCircleExists, in
 {
 	//считаем количество вершин с нечётной степенью
 	int oddDegreeVertexCount = 0;
-	vector<int> degrees = graph->getVerticesDegrees();
+	vector<int> degrees = graph->getVerticesDegrees(); // O(v^2) for AdjMatrix, O(v*log(v)) for AdjList, O(e) for EdgeList
 	for (int v = 0; v < graph->vertexCount; ++v)
 		if (degrees[v] % 2 != 0) {
 			tourStart = v;

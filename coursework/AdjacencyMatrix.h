@@ -31,6 +31,8 @@ public:
 	vector<int> getVerticesInDegrees() const override;	// O(v^2)
 	vector<int> getVerticesOutDegrees() const override;	// O(v^2)
 
+	DSU getUnityComponents() const override;	// O(v^2)
+
 private:
 	vector<vector<int>> adjacencyMatrix;
 };

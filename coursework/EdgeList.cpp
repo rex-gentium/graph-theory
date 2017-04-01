@@ -224,3 +224,15 @@ vector<int> EdgeList::getVerticesOutDegrees() const
 	}
 	return outDegrees;
 }
+
+DSU EdgeList::getUnityComponents() const
+{
+	DSU result(vertexCount);
+	if (isWeighted)
+		for (const auto & edge : edgeList)
+			result.unite(edge.first, edge.second);
+	else 
+		for (const auto & edge : weightedEdgeList)
+			result.unite(get<0>(edge), get<1>(edge));
+	return result;
+}
