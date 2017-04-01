@@ -174,3 +174,72 @@ tuple<int, int, int> AdjacencyList::findMinEdge(bool * isMarked) const
 	}
 	return make_tuple(minI, minJ, minWeight);
 }
+
+int AdjacencyList::getVertexDegree(int vertex) const
+{
+	if (isDirected)
+		return getVertexInDegree(vertex) + getVertexOutDegree(vertex);
+	int degree = 0;
+	if (isWeighted) {
+		degree = weightedAdjacencyList[vertex].size();
+		if (weightedAdjacencyList[vertex].lower_bound(make_pair(vertex, 0)) != weightedAdjacencyList[vertex].end())
+			++degree; // петля учитывается дважды
+	}
+	else {
+		degree = adjacencyList[vertex].size();
+		if (adjacencyList[vertex].find(vertex) != adjacencyList[vertex].end())
+			++degree; // петля учитывается дважды
+	}
+	return 0;
+}
+
+vector<int> AdjacencyList::getVerticesDegrees() const
+{
+	vector<int> degrees(vertexCount);
+	for (int v = 0; v < vertexCount; ++v)
+		degrees[v] = getVertexDegree(v);
+	return degrees;
+}
+
+int AdjacencyList::getVertexInDegree(int vertex) const
+{
+	if (!isDirected) return getVertexDegree(vertex);
+	int inDegree = 0;
+	if (isWeighted) {
+		for (int from = 0; from < vertexCount; ++from)
+			if (adjacencyList[from].find(vertex) != adjacencyList[from].end())
+				++inDegree;
+	}
+	else {
+		for (int from = 0; from < vertexCount; ++from)
+			if (weightedAdjacencyList[from].lower_bound(make_pair(vertex, 0)) != weightedAdjacencyList[from].end())
+				++inDegree;
+	}
+	return inDegree;
+}
+
+int AdjacencyList::getVertexOutDegree(int vertex) const
+{
+	if (!isDirected) return getVertexDegree(vertex);
+	return (isWeighted) ? weightedAdjacencyList[vertex].size() : adjacencyList[vertex].size();
+}
+
+vector<int> AdjacencyList::getVerticesInDegrees() const
+{
+	vector<int> inDegrees(vertexCount, 0);
+	for (int v = 0; v < vertexCount; ++v)
+		if (isWeighted)
+			for (const auto & adjacency : weightedAdjacencyList[v])
+				++inDegrees[adjacency.first];
+		else for (const auto & adjacency : adjacencyList[v])
+				++inDegrees[adjacency];
+	return inDegrees;
+}
+
+vector<int> AdjacencyList::getVerticesOutDegrees() const
+{
+	vector<int> outDegrees(vertexCount);
+	for (int v = 0; v < vertexCount; ++v)
+		outDegrees[v] = getVertexOutDegree(v);
+	return outDegrees;
+}

@@ -101,3 +101,62 @@ tuple<int, int, int> AdjacencyMatrix::findMinEdge(bool * isMarked) const
 	}
 	return make_tuple(minI, minJ, minWeight);
 }
+
+int AdjacencyMatrix::getVertexDegree(int vertex) const
+{
+	if (isDirected) 
+		return getVertexInDegree(vertex) + getVertexOutDegree(vertex);
+
+	int degree = 0;
+	for (int v = 0; v < adjacencyMatrix[vertex].size(); ++v)
+		if (adjacencyMatrix[vertex][v]) {
+			++degree;
+			if (vertex == v && !isDirected)
+				++degree; // петля учитывается дважды
+		}
+	return degree;
+}
+
+vector<int> AdjacencyMatrix::getVerticesDegrees() const
+{
+	vector<int> degrees(vertexCount);
+	for (int v = 0; v < vertexCount; ++v)
+		degrees[v] = getVertexDegree(v);
+	return degrees;
+}
+
+int AdjacencyMatrix::getVertexInDegree(int vertex) const
+{
+	if (!isDirected) return getVertexDegree(vertex);
+	int inDegree = 0;
+	for (int from = 0; from < vertexCount; ++from)
+		if (adjacencyMatrix[from][vertex])
+			++inDegree;
+	return inDegree;
+}
+
+int AdjacencyMatrix::getVertexOutDegree(int vertex) const
+{
+	if (!isDirected) return getVertexDegree(vertex);
+	int outDegree = 0;
+	for (int to = 0; to < vertexCount; ++to)
+		if (adjacencyMatrix[vertex][to])
+			++outDegree;
+	return outDegree;
+}
+
+vector<int> AdjacencyMatrix::getVerticesInDegrees() const
+{
+	vector<int> inDegrees(vertexCount);
+	for (int v = 0; v < vertexCount; ++v)
+		inDegrees[v] = getVertexInDegree(v);
+	return inDegrees;
+}
+
+vector<int> AdjacencyMatrix::getVerticesOutDegrees() const
+{
+	vector<int> outDegrees(vertexCount);
+	for (int v = 0; v < vertexCount; ++v)
+		outDegrees[v] = getVertexOutDegree(v);
+	return outDegrees;
+}

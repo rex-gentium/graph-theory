@@ -114,3 +114,113 @@ tuple<int, int, int> EdgeList::findMinEdge(bool * isMarked) const
 	}
 	return make_tuple(minI, minJ, minWeight);
 }
+
+int EdgeList::getVertexDegree(int vertex) const
+{
+	if (isDirected)
+		return getVertexInDegree(vertex) + getVertexOutDegree(vertex);
+	int degree = 0;
+	if (isWeighted)
+		for (const auto & edge : weightedEdgeList) {
+			int from = get<0>(edge);
+			int to = get<1>(edge);
+			if (from == vertex || to == vertex)
+				++degree;
+			if (from == vertex && to == vertex)
+				++degree; // петля учитывается дважды
+		}
+	else for (const auto & edge : edgeList) {
+			int from = edge.first;
+			int to = edge.second;
+			if (from == vertex || to == vertex)
+				++degree;
+			if (from == vertex && to == vertex)
+				++degree; // петля учитывается дважды
+		}
+	return degree;
+}
+
+vector<int> EdgeList::getVerticesDegrees() const
+{
+	vector<int> degrees(vertexCount, 0);
+	if (isWeighted)
+		for (const auto & edge : weightedEdgeList) {
+			int from = get<0>(edge);
+			int to = get<1>(edge);
+			++degrees[from];
+			++degrees[to];
+		}
+	else for (const auto & edge : edgeList) {
+		int from = edge.first;
+		int to = edge.second;
+		++degrees[from];
+		++degrees[to];
+	}
+	return degrees;
+}
+
+int EdgeList::getVertexInDegree(int vertex) const
+{
+	if (!isDirected) return getVertexDegree(vertex);
+	int inDegree = 0;
+	if (isWeighted)
+		for (const auto & edge : weightedEdgeList) {
+			int to = get<1>(edge);
+			if (to == vertex)
+				++inDegree;
+		}
+	else for (const auto & edge : edgeList) {
+		int to = edge.second;
+		if (to == vertex)
+			++inDegree;
+	}
+	return 0;
+}
+
+int EdgeList::getVertexOutDegree(int vertex) const
+{
+	if (!isDirected) return getVertexDegree(vertex);
+	int outDegree = 0;
+	if (isWeighted)
+		for (const auto & edge : weightedEdgeList) {
+			int from = get<0>(edge);
+			if (from == vertex)
+				++outDegree;
+		}
+	else for (const auto & edge : edgeList) {
+		int from = edge.first;
+		if (from == vertex)
+			++outDegree;
+	}
+	return 0;
+}
+
+vector<int> EdgeList::getVerticesInDegrees() const
+{
+	vector<int> inDegrees(vertexCount, 0);
+	if (isWeighted)
+		for (const auto & edge : weightedEdgeList) {
+			int to = get<1>(edge);
+			++inDegrees[to];
+		}
+	else for (const auto & edge : edgeList) {
+		int to = edge.second;
+		++inDegrees[to];
+	}
+	return inDegrees;
+}
+
+vector<int> EdgeList::getVerticesOutDegrees() const
+{
+	vector<int> outDegrees(vertexCount, 0);
+	if (isWeighted)
+		for (const auto & edge : weightedEdgeList) {
+			int from = get<0>(edge);
+			++outDegrees[from];
+		}
+	else for (const auto & edge : edgeList) {
+		int from = edge.first;
+		++outDegrees[from];
+	}
+	return outDegrees;
+}

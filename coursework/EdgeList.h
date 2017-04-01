@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "GraphContent.h"
+#include <vector>
 #include <set>
 #include <list>
 
@@ -21,6 +22,13 @@ public:
 	list<tuple<int, int, int>> getWeightedEdgesList() const override;
 	/* O(e) */
 	tuple<int, int, int> findMinEdge(bool * isMarked) const override;
+
+	int getVertexDegree(int vertex) const override;		// O(e)
+	vector<int> getVerticesDegrees() const override;	// O(e)
+	int getVertexInDegree(int vertex) const override;	// O(e)
+	int getVertexOutDegree(int vertex) const override;	// O(e)
+	vector<int> getVerticesInDegrees() const override;	// O(e)
+	vector<int> getVerticesOutDegrees() const override;	// O(e)
 
 private:
 	set<pair<int, int>> edgeList;

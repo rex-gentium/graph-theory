@@ -122,13 +122,12 @@ bool Algorithm::checkEuler(const GraphContent * graph, bool & isCircleExists, in
 {
 	//считаем количество вершин с нечётной степенью
 	int oddDegreeVertexCount = 0;
-	vector<int> degrees = graph->getVertexDegrees();
+	vector<int> degrees = graph->getVerticesDegrees();
 	for (int v = 0; v < graph->vertexCount; ++v)
 		if (degrees[v] % 2 != 0) {
 			tourStart = v;
 			if (++oddDegreeVertexCount > 2)
-				// граф вообще не является эйлеровым
-				return false;
+				return false;	// граф вообще не является эйлеровым
 		}
 	// в графе есть эйлеров цикл, если все вершины чётной степени
 	isCircleExists = oddDegreeVertexCount == 0;

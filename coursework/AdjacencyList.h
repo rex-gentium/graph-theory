@@ -23,6 +23,13 @@ public:
 	/* O(v*e) */
 	tuple<int, int, int> findMinEdge(bool * isMarked) const override;
 
+	int getVertexDegree(int vertex) const override;		// O(log(v))
+	vector<int> getVerticesDegrees() const override;	// O(v*log(v))
+	int getVertexInDegree(int vertex) const override;	// O(v*log(v)) 
+	int getVertexOutDegree(int vertex) const override;	// O(1)
+	vector<int> getVerticesInDegrees() const override;	// O(v^2)
+	vector<int> getVerticesOutDegrees() const override;	// O(v)
+
 private:
 	vector<set<int>> adjacencyList;
 	vector<set<pair<int, int>>> weightedAdjacencyList;
