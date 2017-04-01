@@ -147,3 +147,9 @@ Graph Graph::getSpaingTreeBoruvka()
 	result.content = Algorithm::getSpaingTreeBoruvka(this->content);
 	return result;
 }
+
+int Graph::checkEuler(bool & circleExist)
+{
+	int result;
+	return (Algorithm::checkEuler(this->content, circleExist, result)) ? result : 0;
+}

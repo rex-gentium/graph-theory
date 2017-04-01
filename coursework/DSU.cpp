@@ -38,3 +38,13 @@ int DSU::find(int x) const {
 		return x;
 	return parent[x] = find(parent[x]);
 }
+
+int * DSU::getLeaders() const
+{
+	int * result = new int[setCount];
+	int resultIndex = 0;
+	for (int x = 0; x < size; ++x)
+		if (parent[x] == x)
+			result[resultIndex++] = x;
+	return result;
+}

@@ -117,3 +117,39 @@ GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 	}
 	return result;
 }
+
+bool Algorithm::checkEuler(const GraphContent * graph, bool & isCircleExists, int & tourStart)
+{
+	//считаем количество вершин с нечётной степенью
+	int oddDegreeVertexCount = 0;
+	vector<int> degrees = graph->getVertexDegrees();
+	for (int v = 0; v < graph->vertexCount; ++v)
+		if (degrees[v] % 2 != 0) {
+			tourStart = v;
+			if (++oddDegreeVertexCount > 2)
+				// граф вообще не является эйлеровым
+				return false;
+		}
+	// в графе есть эйлеров цикл, если все вершины чётной степени
+	isCircleExists = oddDegreeVertexCount == 0;
+	// в графе есть эйлеров путь, если вершин нечётной степени 0 или 2
+	if (oddDegreeVertexCount == 1)
+		return false;
+	
+	// число компонент связности, имеющих рёбра, не должно быть больше 1
+	DSU unityComponents = graph->getUnityComponents();
+	if (unityComponents.getSetCount() == 1)
+		return true;
+	int connectedComponent = -1; // запомним ту единственную компоненту, которой можно иметь ребра
+	for (int v = 0; v < graph->vertexCount; ++v) {
+		int leader = unityComponents.find(v);
+		if (leader != v)
+			// вершина не является лидером компоненты, значит связана ребрами с лидером
+			if (connectedComponent < 0)
+				connectedComponent = leader;
+			else if (connectedComponent != leader)
+				return false;
+	}
+
+	return true;
+}

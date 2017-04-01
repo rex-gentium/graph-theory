@@ -26,7 +26,9 @@ public:
 	int find(int x) const;
 	/* возвращает количество множеств */
 	int getSetCount() const { return setCount; }
-
+	/* возвращает массив лидеров множеств размера getSetCount()
+	массив должен быть уничтожен после использования */
+	int * getLeaders() const;
 private:
 	int * parent;
 	int * rank;
