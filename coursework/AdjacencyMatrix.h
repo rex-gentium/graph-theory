@@ -15,14 +15,15 @@ public:
 
 	void read(istream & inpFile) override;
 	void write(ostream & outFile) override;
-	void addEdge(int from, int to, int weight) override;
-	int changeEdge(int from, int to, int newWeight) override;
-	void removeEdge(int from, int to) override;
 
-	/* O(v^2) */
-	list<tuple<int, int, int>> getWeightedEdgesList() const override;
-	/* O(v^2) */
-	tuple<int, int, int> findMinEdge(bool * isMarked) const override;
+	bool hasEdges() const override;								// O(v^2)
+	void addEdge(int from, int to, int weight) override;		// O(1)
+	int changeEdge(int from, int to, int newWeight) override;	// O(1)
+	void removeEdge(int from, int to) override;					// O(1)
+	int getWeight(int from, int to) const override;				// O(1)
+
+	list<tuple<int, int, int>> getWeightedEdgesList() const override; // O(v^2)
+	tuple<int, int, int> findMinEdge(bool * isMarked) const override; // O(v^2)
 	
 	int getVertexDegree(int vertex) const override;		// O(v)
 	vector<int> getVerticesDegrees() const override;	// O(v^2)

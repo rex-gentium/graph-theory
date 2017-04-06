@@ -42,6 +42,11 @@ void EdgeList::write(ostream & outFile) {
 			outFile << edge.first + 1 << ' ' << edge.second + 1 << '\n';
 }
 
+bool EdgeList::hasEdges() const
+{
+	return (isWeighted) ? !weightedEdgeList.empty() : !edgeList.empty();
+}
+
 void EdgeList::addEdge(int from, int to, int weight) {
 	if (isWeighted)
 		weightedEdgeList.insert(make_tuple(from, to, weight));
@@ -92,6 +97,14 @@ void EdgeList::removeEdge(int from, int to) {
 		if (!isDirected)
 			edgeList.erase(make_pair(to, from));
 	}
+}
+
+int EdgeList::getWeight(int from, int to) const
+{
+	if (!isWeighted)
+		return 0;
+	auto it = weightedEdgeList.lower_bound(make_tuple(from, to, 0));
+	return (it != weightedEdgeList.end()) ? get<2>(*it) : 0;
 }
 
 list<tuple<int, int, int>> EdgeList::getWeightedEdgesList() const {
@@ -227,12 +240,12 @@ vector<int> EdgeList::getVerticesOutDegrees() const
 
 DSU EdgeList::getUnityComponents() const
 {
-	DSU result(vertexCount);
-	if (isWeighted)
+	DSU * result = new DSU(vertexCount);
+	if (!isWeighted)
 		for (const auto & edge : edgeList)
-			result.unite(edge.first, edge.second);
+			result->unite(edge.first, edge.second);
 	else 
 		for (const auto & edge : weightedEdgeList)
-			result.unite(get<0>(edge), get<1>(edge));
-	return result;
+			result->unite(get<0>(edge), get<1>(edge));
+	return *result;
 }

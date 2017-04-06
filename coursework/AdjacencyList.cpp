@@ -76,6 +76,21 @@ void AdjacencyList::write(ostream & outFile) {
 	}
 }
 
+bool AdjacencyList::hasEdges() const
+{
+	if (isWeighted) {
+		for (int i = 0; i < vertexCount; ++i)
+			if (!weightedAdjacencyList[i].empty())
+				return true;
+	}
+	else {
+		for (int i = 0; i < vertexCount; ++i)
+			if (!adjacencyList[i].empty())
+				return true;
+	}
+	return false;
+}
+
 void AdjacencyList::addEdge(int from, int to, int weight) {
 	if (isWeighted) {
 		weightedAdjacencyList[from].insert(make_pair(to, weight));
@@ -141,6 +156,14 @@ void AdjacencyList::removeEdge(int from, int to) {
 				vertexAdjList->erase(it);
 		}
 	}
+}
+
+int AdjacencyList::getWeight(int from, int to) const
+{
+	if (!isWeighted)
+		return 0;
+	auto it = weightedAdjacencyList[from].lower_bound(make_pair(to, 0));
+	return (it != weightedAdjacencyList[from].end()) ? it->second : 0;
 }
 
 list<tuple<int, int, int>> AdjacencyList::getWeightedEdgesList() const
@@ -246,14 +269,14 @@ vector<int> AdjacencyList::getVerticesOutDegrees() const
 
 DSU AdjacencyList::getUnityComponents() const
 {
-	DSU result(vertexCount);
+	DSU * result = new DSU(vertexCount);
 	if (isWeighted)
 		for (int from = 0; from < vertexCount; ++from)
 			for (const auto & adjacency : weightedAdjacencyList[from])
-				result.unite(from, adjacency.first);
+				result->unite(from, adjacency.first);
 	else
 		for (int from = 0; from < vertexCount; ++from)
 			for (const auto & to : adjacencyList[from])
-				result.unite(from, to);
-	return result;
+				result->unite(from, to);
+	return *result;
 }

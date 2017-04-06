@@ -5,9 +5,9 @@ int main() {
 
 	graph.readGraph("D:\\test_graph.txt");
 	
-	Graph spaingTree = graph.getSpaingTreeBoruvka();
+	vector<int> tour = graph.getEuleranTourFleri();
 	
-	spaingTree.writeGraph("D:\\output_graph.txt");
+	graph.writeGraph("D:\\output_graph.txt");
 	
 	return 0;
 }

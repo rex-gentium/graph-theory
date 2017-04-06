@@ -42,7 +42,7 @@ void AdjacencyMatrix::read(istream & inpFile) {
 		for (int to = from; to < vertexCount; to++)
 			if (adjacencyMatrix[from][to] != adjacencyMatrix[to][from]) { // асимметричность — достаточное условие
 				this->isDirected = true;
-				return; // этот цикл всегда должен стоять последним в методе
+				return; //этот цикл всегда должен быть последним в методе
 			}
 	}
 }
@@ -52,6 +52,15 @@ void AdjacencyMatrix::write(ostream & outFile) {
 	for (int from = 0; from < vertexCount; from++)
 		for (int to = 0; to < vertexCount; to++)
 			outFile << adjacencyMatrix[from][to] << ((to == vertexCount - 1) ? '\n' : ' ');
+}
+
+bool AdjacencyMatrix::hasEdges() const
+{
+	for (int i = 0; i < adjacencyMatrix.size(); ++i)
+		for (int j = 0; j < adjacencyMatrix.size(); ++j)
+			if (adjacencyMatrix[i][j])
+				return true;
+	return false;
 }
 
 void AdjacencyMatrix::addEdge(int from, int to, int weight) {
@@ -72,6 +81,11 @@ void AdjacencyMatrix::removeEdge(int from, int to) {
 	adjacencyMatrix[from][to] = 0;
 	if (!isDirected) // поддержка симметрии матрицы неориентированного графа
 		adjacencyMatrix[to][from] = 0;
+}
+
+int AdjacencyMatrix::getWeight(int from, int to) const
+{
+	return (isWeighted) ? adjacencyMatrix[from][to] : 0;
 }
 
 list<tuple<int, int, int>> AdjacencyMatrix::getWeightedEdgesList() const
@@ -163,10 +177,10 @@ vector<int> AdjacencyMatrix::getVerticesOutDegrees() const
 
 DSU AdjacencyMatrix::getUnityComponents() const
 {
-	DSU result(vertexCount);
+	DSU * result = new DSU(vertexCount);
 	for (int from = 0; from < vertexCount; ++from)
 		for (int to = (isDirected) ? from : 0; to < vertexCount; ++to)
 			if (adjacencyMatrix[from][to])
-				result.unite(from, to);
-	return result;
+				result->unite(from, to);
+	return *result;
 }

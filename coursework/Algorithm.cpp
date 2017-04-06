@@ -140,10 +140,145 @@ bool Algorithm::checkEuler(const GraphContent * graph, bool & isCircleExists, in
 	return result;
 }
 
+vector<int> Algorithm::getEuleranTourFleri(const AdjacencyMatrix * graph)
+{
+	vector<int> tour;
+	bool isEuleranCircle;
+	int tourStart;
+	if (!checkEuler(graph, isEuleranCircle, tourStart))
+		return tour;
+	if (isEuleranCircle)
+		tourStart = 0;
+	tour.push_back(tourStart);
+	
+	AdjacencyMatrix copy(*graph);
+	int currentVertex = tourStart;
+	int bridgeVertex = -1; // на случай если попадется мост
+	int nextVertex = -1;
+	while (copy.hasEdges()) {
+		for (int to = 0; to < graph->vertexCount; ++to) {
+			if (copy.adjacencyMatrix[currentVertex][to])
+				if (copy.isBridge(currentVertex, to))
+					bridgeVertex = to;
+				else {
+					nextVertex = to;
+					break;
+				}	
+		}
+		// мост выбирается в последнюю очередь
+		if (nextVertex < 0)
+			nextVertex = bridgeVertex;
+		tour.push_back(nextVertex);
+		copy.removeEdge(currentVertex, nextVertex);
+		currentVertex = nextVertex;
+		nextVertex = bridgeVertex = -1;
+	}
+	return tour;
+}
+
+vector<int> Algorithm::getEuleranTourFleri(const AdjacencyList * graph)
+{
+	vector<int> tour;
+	bool isEuleranCircle;
+	int tourStart;
+	if (!checkEuler(graph, isEuleranCircle, tourStart))
+		return tour;
+	if (isEuleranCircle)
+		tourStart = 0;
+	tour.push_back(tourStart);
+
+	AdjacencyList copy(*graph);
+	int currentVertex = tourStart;
+	int bridgeVertex = -1; // на случай если попадется мост
+	int nextVertex = -1;
+	while (copy.hasEdges()) {
+		if (copy.isWeighted) {
+			for (const auto & adjacency : copy.weightedAdjacencyList[currentVertex])
+				if (copy.isBridge(currentVertex, adjacency.first))
+					bridgeVertex = adjacency.first;
+				else {
+					nextVertex = adjacency.first;
+					break;
+				}
+		}
+		else {
+			for (const auto & to : copy.adjacencyList[currentVertex])
+				if (copy.isBridge(currentVertex, to))
+					bridgeVertex = to;
+				else {
+					nextVertex = to;
+					break;
+				}
+		}
+		// мост выбирается в последнюю очередь
+		if (nextVertex < 0)
+			nextVertex = bridgeVertex;
+		tour.push_back(nextVertex);
+		copy.removeEdge(currentVertex, nextVertex);
+		currentVertex = nextVertex;
+		nextVertex = bridgeVertex = -1;
+	}
+	return tour;
+}
+
+vector<int> Algorithm::getEuleranTourFleri(const EdgeList * graph)
+{
+	vector<int> tour;
+	bool isEuleranCircle;
+	int tourStart;
+	if (!checkEuler(graph, isEuleranCircle, tourStart))
+		return tour;
+	if (isEuleranCircle)
+		tourStart = 0;
+	tour.push_back(tourStart);
+
+	EdgeList copy(*graph);
+	int currentVertex = tourStart;
+	int bridgeVertex = -1; // на случай если попадется мост
+	int nextVertex = -1;
+	while (copy.hasEdges()) {
+		if (copy.isWeighted) {
+			auto edge = copy.weightedEdgeList.lower_bound(make_tuple(currentVertex, 0, 0));
+			while (edge != copy.weightedEdgeList.end() && get<0>(*edge) == currentVertex) {
+				int to = get<1>(*edge);
+				if (copy.isBridge(currentVertex, to))
+					bridgeVertex = to;
+				else {
+					nextVertex = to;
+					break;
+				}
+				++edge;
+			}
+		}
+		else {
+			auto edge = copy.edgeList.lower_bound(make_pair(currentVertex, 0));
+			while (edge != copy.edgeList.end() && edge->first == currentVertex) {
+				int to = edge->second;
+				if (copy.isBridge(currentVertex, to))
+					bridgeVertex = to;
+				else {
+					nextVertex = to;
+					break;
+				}
+				edge = copy.edgeList.lower_bound(make_pair(currentVertex, 0));
+				++edge;
+			}
+		}
+		// мост выбирается в последнюю очередь
+		if (nextVertex < 0)
+			nextVertex = bridgeVertex;
+		tour.push_back(nextVertex);
+		copy.removeEdge(currentVertex, nextVertex);
+		currentVertex = nextVertex;
+		nextVertex = bridgeVertex = -1;
+	}
+	return tour;
+}
+
 bool Algorithm::checkEulerDegrees(const GraphContent * graph, bool & isCircleExists, int & tourStart)
 {
 	int tourFinish = tourStart = -1;
-	if (graph->isDirected) {
+	if (!graph->isDirected) {
 		// неорграф является эйлеровым, если в нём 0 или 2 вершины нечётной степени
 		vector<int> degrees = graph->getVerticesDegrees(); // O(v^2) for AdjMatrix, O(v*log(v)) for AdjList, O(e) for EdgeList
 		for (int v = 0; v < graph->vertexCount; ++v)
@@ -166,12 +301,12 @@ bool Algorithm::checkEulerDegrees(const GraphContent * graph, bool & isCircleExi
 			switch (sub) {
 			case 1:
 				if (tourStart >= 0) return false;
-				else tourStart == v;
+				else tourStart = v;
 				break;
 			case 0: break;
 			case -1:
 				if (tourFinish >= 0) return false;
-				else tourFinish == v;
+				else tourFinish = v;
 				break;
 			default: return false;
 			}
@@ -182,4 +317,5 @@ bool Algorithm::checkEulerDegrees(const GraphContent * graph, bool & isCircleExi
 	// в графе есть эйлеров путь, если есть 2 вышеуказанных вершины
 	if (tourStart < 0 != tourFinish < 0) // tourStartExists XOR tourFinishExists
 		return false;
+	return true;
 }
