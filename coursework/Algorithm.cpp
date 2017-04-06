@@ -293,18 +293,17 @@ bool Algorithm::checkEulerDegrees(const GraphContent * graph, bool & isCircleExi
 	else {
 		// орграф является эйлеровым, если полустепени захода равны полустепеням исхода у всех вершин,
 		// кроме, может быть, двух: одна должна иметь бОльшую (на 1) степень исхода, вторая бОльшую (на 1) степень захода
-		int tourFinish = tourStart = -1;
 		vector<int> inDegrees = graph->getVerticesInDegrees(); // O(v^2) for AdjMatrix, AdjList, O(e) for EdgeList
 		vector<int> outDegrees = graph->getVerticesOutDegrees(); // O(v^2) for AdjMatrix, O(v) for AdjList, O(e) for EdgeList
 		for (int v = 0; v < graph->vertexCount; ++v) {
 			int sub = inDegrees[v] - outDegrees[v];
 			switch (sub) {
-			case 1:
+			case -1:
 				if (tourStart >= 0) return false;
 				else tourStart = v;
 				break;
 			case 0: break;
-			case -1:
+			case 1:
 				if (tourFinish >= 0) return false;
 				else tourFinish = v;
 				break;
