@@ -169,3 +169,11 @@ vector<int> Graph::getEuleranTourFleri()
 		++result[i];
 	return result;
 }
+
+vector<int> Graph::getEuleranTourEffective()
+{
+	vector<int> result = Algorithm::getEuleranTour(this->content);
+	for (int i = 0; i < result.size(); ++i)
+		++result[i];
+	return result;
+}

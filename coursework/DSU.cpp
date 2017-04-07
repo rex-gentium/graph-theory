@@ -10,18 +10,11 @@ DSU::DSU(int setCount) {
 		parent[i] = i;
 		rank[i] = 0;
 	}
-	initialSetCount = setCount;
 }
 
 DSU::~DSU() {
-	if (initialSetCount > 1) {
-		delete[] parent;
-		delete[] rank;
-	}
-	else {
-		delete parent;
-		delete rank;
-	}
+	delete[] parent;
+	delete[] rank;
 }
 
 void DSU::unite(int x, int y) {

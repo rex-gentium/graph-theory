@@ -3,9 +3,9 @@
 int main() {
 	Graph graph;
 
-	graph.readGraph("C:\\dump\\test_adjList.txt");
+	graph.readGraph("D:\\test_graph.txt");
 	
-	vector<int> tour = graph.getEuleranTourFleri();
+	vector<int> tour = graph.getEuleranTourEffective();
 	
 	//graph.writeGraph("D:\\output_graph.txt");
 	

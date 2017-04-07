@@ -42,6 +42,11 @@ void EdgeList::write(ostream & outFile) {
 			outFile << edge.first + 1 << ' ' << edge.second + 1 << '\n';
 }
 
+GraphContent * EdgeList::getCopy() const
+{
+	return new EdgeList(*this);
+}
+
 bool EdgeList::hasEdges() const
 {
 	return (isWeighted) ? !weightedEdgeList.empty() : !edgeList.empty();
@@ -105,6 +110,26 @@ int EdgeList::getWeight(int from, int to) const
 		return 0;
 	auto it = weightedEdgeList.lower_bound(make_tuple(from, to, 0));
 	return (it != weightedEdgeList.end()) ? get<2>(*it) : 0;
+}
+
+int EdgeList::getAdjacent(int from) const
+{
+	if (isWeighted) {
+		auto it = weightedEdgeList.lower_bound(make_tuple(from, 0, 0));
+		return (it != weightedEdgeList.end()) ? get<1>(*it) : -1;
+	} else {
+		auto it = edgeList.lower_bound(make_pair(from, 0));
+		return (it != edgeList.end()) ? it->second : -1;
+	}
+	// если не ориентирован, то может имеется в виду другой конец ребра
+	if (isWeighted) {
+		for (auto it = weightedEdgeList.begin(); it != weightedEdgeList.end(); ++it)
+			if (get<1>(*it) == from) return get<0>(*it);
+	}
+	else {
+		for (auto it = edgeList.begin(); it != edgeList.end(); ++it)
+			if (it->second == from) return it->first;
+	}
 }
 
 list<tuple<int, int, int>> EdgeList::getWeightedEdgesList() const {

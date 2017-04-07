@@ -1,6 +1,8 @@
 ﻿#include "Algorithm.h"
 #include "DSU.h"
+#include <algorithm>
 #include <tuple>
+#include <stack>
 
 GraphContent * Algorithm::getSpaingTreePrima(const GraphContent * graph) {
 	AdjacencyMatrix* result = new AdjacencyMatrix(graph->vertexCount);
@@ -138,6 +140,28 @@ bool Algorithm::checkEuler(const GraphContent * graph, bool & isCircleExists, in
 		}
 	}
 	return result;
+}
+
+vector<int> Algorithm::getEuleranTour(const GraphContent * graph)
+{
+	GraphContent * copy = graph->getCopy();
+	stack<int> st;
+	vector<int> tour;
+	st.push(0);
+	while(!st.empty()) {
+		int v = st.top();
+		if (copy->getVertexDegree(v) == 0) {
+			tour.push_back(v);
+			st.pop();
+		}
+		else {
+			int w = copy->getAdjacent(v);
+			copy->removeEdge(v, w);
+			st.push(w);
+		}
+	}
+	std::reverse(tour.begin(), tour.end()); // O(e)
+	return tour;
 }
 
 vector<int> Algorithm::getEuleranTourFleri(const AdjacencyMatrix * graph)

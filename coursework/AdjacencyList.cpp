@@ -76,6 +76,11 @@ void AdjacencyList::write(ostream & outFile) {
 	}
 }
 
+GraphContent * AdjacencyList::getCopy() const
+{
+	return new AdjacencyList(*this);
+}
+
 bool AdjacencyList::hasEdges() const
 {
 	if (isWeighted) {
@@ -166,6 +171,14 @@ int AdjacencyList::getWeight(int from, int to) const
 	return (it != weightedAdjacencyList[from].end()) ? it->second : 0;
 }
 
+int AdjacencyList::getAdjacent(int from) const
+{
+	if (isWeighted)
+		return (weightedAdjacencyList[from].empty()) ? -1 : weightedAdjacencyList[from].begin()->first;
+	else
+		return (adjacencyList[from].empty()) ? -1 : *adjacencyList[from].begin();
+}
+
 list<tuple<int, int, int>> AdjacencyList::getWeightedEdgesList() const
 {
 	list<tuple<int, int, int>> result;
@@ -228,7 +241,7 @@ int AdjacencyList::getVertexInDegree(int vertex) const
 {
 	if (!isDirected) return getVertexDegree(vertex);
 	int inDegree = 0;
-	if (isWeighted) {
+	if (!isWeighted) {
 		for (int from = 0; from < vertexCount; ++from)
 			if (adjacencyList[from].find(vertex) != adjacencyList[from].end())
 				++inDegree;

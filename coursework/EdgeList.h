@@ -15,11 +15,14 @@ public:
 	void read(istream & inpFile) override;
 	void write(ostream & outFile) override;
 
+	GraphContent * getCopy() const override;
+
 	bool hasEdges() const override;
 	void addEdge(int from, int to, int weight) override;		// O(log(e))
 	int changeEdge(int from, int to, int newWeight) override;	// O(log(e))
 	void removeEdge(int from, int to) override;					// O(log(e))
 	int getWeight(int from, int to) const override;				// O(log(e))
+	int getAdjacent(int from) const override;					// O(e)
 
 	list<tuple<int, int, int>> getWeightedEdgesList() const override; // O(e)
 	tuple<int, int, int> findMinEdge(bool * isMarked) const override; // O(e)

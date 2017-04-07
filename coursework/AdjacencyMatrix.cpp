@@ -54,6 +54,11 @@ void AdjacencyMatrix::write(ostream & outFile) {
 			outFile << adjacencyMatrix[from][to] << ((to == vertexCount - 1) ? '\n' : ' ');
 }
 
+GraphContent * AdjacencyMatrix::getCopy() const
+{
+	return new AdjacencyMatrix(*this);
+}
+
 bool AdjacencyMatrix::hasEdges() const
 {
 	for (int i = 0; i < adjacencyMatrix.size(); ++i)
@@ -86,6 +91,14 @@ void AdjacencyMatrix::removeEdge(int from, int to) {
 int AdjacencyMatrix::getWeight(int from, int to) const
 {
 	return (isWeighted) ? adjacencyMatrix[from][to] : 0;
+}
+
+int AdjacencyMatrix::getAdjacent(int from) const
+{
+	for (int to = 0; to < vertexCount; ++to)
+		if (adjacencyMatrix[from][to])
+			return adjacencyMatrix[from][to];
+	return -1;
 }
 
 list<tuple<int, int, int>> AdjacencyMatrix::getWeightedEdgesList() const
