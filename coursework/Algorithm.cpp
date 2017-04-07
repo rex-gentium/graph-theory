@@ -1,6 +1,7 @@
 ﻿#include "Algorithm.h"
 #include "DSU.h"
 #include <tuple>
+#include <map>
 
 GraphContent * Algorithm::getSpaingTreePrima(const GraphContent * graph) {
 	AdjacencyMatrix* result = new AdjacencyMatrix(graph->vertexCount);
@@ -12,7 +13,6 @@ GraphContent * Algorithm::getSpaingTreePrima(const GraphContent * graph) {
 
 	isMarked[0] = true;
 	bool hasUnmarked = (graph->vertexCount == 1) ? false : true;
-	auto edges = graph->getWeightedEdgesList();
 	while (hasUnmarked) {
 		// ищем минимальное из ребёр, соединяющих помеченную вершину с непомеченной
 		tuple<int, int, int> edge = graph->findMinEdge(isMarked);
@@ -56,18 +56,16 @@ GraphContent * Algorithm::getSpaingTreeKruscal(const GraphContent * graph) {
 	// сортировка рёбер e*log(e)
 	edges.sort(compareWeight);
 	// распределение по компонентам связности
-	DSU unityComponents(graph->vertexCount);
+	DSU components(graph->vertexCount);
 	while (!edges.empty()) {
 		auto edge = edges.front();
-		int from = get<0>(edge);
-		int to = get<1>(edge);
-		int weight = get<2>(edge);
-		int leftUnityComponent = unityComponents.find(from);
-		int rightUnityComponent = unityComponents.find(to);
-		if (leftUnityComponent != rightUnityComponent) {
+		int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
+		int leftComponent = components.find(from);
+		int rightComponent = components.find(to);
+		if (leftComponent != rightComponent) {
 			// добавление ребра не образует цикл
 			result->addEdge(to, from, weight);
-			unityComponents.unite(leftUnityComponent, rightUnityComponent);
+			components.unite(leftComponent, rightComponent);
 		}
 		// если добавление ребра образует цикл, оно непригодно для постройки остова
 		edges.pop_front();
@@ -82,33 +80,32 @@ GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 	result->isWeighted = graph->isWeighted;
 	result->vertexCount = graph->vertexCount;
 
-	DSU unityComponents(graph->vertexCount);
+	DSU components(graph->vertexCount);
 	auto edges = graph->getWeightedEdgesList();
-	vector<tuple<int, int, int>> edgesToAdd;
+	map<int, tuple<int, int, int>*> edgesToAdd;
 	
-	while (unityComponents.getSetCount() > 1) {
+	while (components.getSetCount() > 1) {
 		// на каждой итерации будем добавлять к каждой из компонент по ребру
-		edgesToAdd.resize(graph->vertexCount, make_tuple(-1, -1, INT_MAX));
-		// для ищем среди ребер минимальные, связующие разные компоненты
+		// ищем среди ребер минимальные, связующие разные компоненты
 		for (auto & edge : edges) {
-			int from = get<0>(edge);
-			int to = get<1>(edge);
-			int weight = get<2>(edge);
-			int fromComponent = unityComponents.find(from);
-			int toComponent = unityComponents.find(to);
+			int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
+			int fromComponent = components.find(from);
+			int toComponent = components.find(to);
 			if (fromComponent != toComponent) {
-				if (weight < get<2>(edgesToAdd[fromComponent]))
-					edgesToAdd[fromComponent] = make_tuple(from, to, weight);
-				if (weight < get<2>(edgesToAdd[toComponent]))
-					edgesToAdd[toComponent] = make_tuple(from, to, weight);
+				int currWeight = (edgesToAdd.find(fromComponent) != edgesToAdd.end()) ? get<2>(*edgesToAdd[fromComponent]) : INT_MAX;
+				if (weight < currWeight)
+					edgesToAdd[fromComponent] = &edge;
+				currWeight = (edgesToAdd.find(toComponent) != edgesToAdd.end()) ? get<2>(*edgesToAdd[toComponent]) : INT_MAX;
+				if (weight < currWeight)
+					edgesToAdd[toComponent] = &edge;
 			}
 		}
 		bool didEdgeAdding = false;
 		for (auto & edge : edgesToAdd) {
-			int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
-			if (from < 0 || to < 0) continue;
+			int from = get<0>(*edge.second), to = get<1>(*edge.second), weight = get<2>(*edge.second);
+			//if (from < 0 || to < 0) continue;
 			result->addEdge(from, to, weight);
-			unityComponents.unite(from, to);
+			components.unite(from, to);
 			didEdgeAdding = true;
 		}
 		if (!didEdgeAdding)
