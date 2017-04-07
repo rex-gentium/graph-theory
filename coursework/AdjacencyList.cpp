@@ -280,3 +280,26 @@ DSU AdjacencyList::getUnityComponents() const
 				result->unite(from, to);
 	return *result;
 }
+
+DSU AdjacencyList::getUnityComponents(int exceptFrom, int exceptTo) const
+{
+	DSU * result = new DSU(vertexCount);
+	if (isWeighted)
+		for (int from = 0; from < vertexCount; ++from)
+			for (const auto & adjacency : weightedAdjacencyList[from]) {
+				int to = adjacency.first;
+				if (from == exceptFrom && to == exceptTo
+					|| !isDirected && from == exceptTo && to == exceptFrom)
+					continue;
+				result->unite(from, adjacency.first);
+			}
+	else
+		for (int from = 0; from < vertexCount; ++from)
+			for (const auto & to : adjacencyList[from]) {
+				if (from == exceptFrom && to == exceptTo
+					|| !isDirected && from == exceptTo && to == exceptFrom)
+					continue;
+				result->unite(from, to);
+			}
+	return *result;
+}

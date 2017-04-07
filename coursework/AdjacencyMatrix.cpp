@@ -184,3 +184,14 @@ DSU AdjacencyMatrix::getUnityComponents() const
 				result->unite(from, to);
 	return *result;
 }
+
+DSU AdjacencyMatrix::getUnityComponents(int exceptFrom, int exceptTo) const
+{
+	DSU * result = new DSU(vertexCount);
+	for (int from = 0; from < vertexCount; ++from)
+		for (int to = (isDirected) ? from : 0; to < vertexCount; ++to)
+			if (adjacencyMatrix[from][to] 
+				&& !(from == exceptFrom && to == exceptTo || from == exceptTo && to == exceptFrom))
+				result->unite(from, to);
+	return *result;
+}

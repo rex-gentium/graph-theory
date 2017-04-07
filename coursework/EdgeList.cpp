@@ -249,3 +249,25 @@ DSU EdgeList::getUnityComponents() const
 			result->unite(get<0>(edge), get<1>(edge));
 	return *result;
 }
+
+DSU EdgeList::getUnityComponents(int exceptFrom, int exceptTo) const
+{
+	DSU * result = new DSU(vertexCount);
+	if (!isWeighted)
+		for (const auto & edge : edgeList) {
+			int from = edge.first, to = edge.second;
+			if (from == exceptFrom && to == exceptTo
+				|| !isDirected && from == exceptTo && to == exceptFrom)
+				continue;
+			result->unite(edge.first, edge.second);
+		}
+	else
+		for (const auto & edge : weightedEdgeList) {
+			int from = get<0>(edge), to = get<1>(edge);
+			if (from == exceptFrom && to == exceptTo
+				|| !isDirected && from == exceptTo && to == exceptFrom)
+				continue;
+			result->unite(from, to);
+		}
+	return *result;
+}

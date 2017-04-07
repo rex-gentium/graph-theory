@@ -23,7 +23,7 @@ public:
 	virtual void addEdge(int from, int to, int weight = 0) = 0;
 	virtual int changeEdge(int from, int to, int newWeight) = 0;
 	virtual void removeEdge(int from, int to) = 0;
-	bool isBridge(int from, int to);
+	bool isBridge(int from, int to) const; // O(getUnityComponents(int,int))
 	virtual int getWeight(int from, int to) const = 0;
 
 	/* возвращает список взвешенных рёбер графа <from, to, weight>*/
@@ -45,5 +45,9 @@ public:
 	virtual vector<int> getVerticesOutDegrees() const = 0;
 	/* возвращает компоненты [слабой] связности в виде системы непересекающихся множеств */
 	virtual DSU getUnityComponents() const = 0;
+private:
+	/* костыль. возвращает компоненты [слабой] связности в виде системы непересекающихся множеств,
+	исключая из рассмотрения ребро (exceptFrom, exceptTo) */
+	virtual DSU getUnityComponents(int exceptFrom, int exceptTo) const = 0;
 };
 

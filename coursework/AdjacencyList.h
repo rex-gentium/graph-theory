@@ -36,5 +36,7 @@ public:
 private:
 	vector<set<int>> adjacencyList;
 	vector<set<pair<int, int>>> weightedAdjacencyList;
+
+	DSU getUnityComponents(int exceptFrom, int exceptTo) const override;
 };
 

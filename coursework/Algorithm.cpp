@@ -123,7 +123,7 @@ bool Algorithm::checkEuler(const GraphContent * graph, bool & isCircleExists, in
 	bool result = checkEulerDegrees(graph, isCircleExists, tourStart);
 	if (result == true) {
 		// число компонент [слабой] связности, имеющих рёбра, не должно быть больше 1
-		DSU unityComponents = graph->getUnityComponents();
+		DSU unityComponents = graph->getUnityComponents(); // O(v^2) for AdjMatrix, O(v*log(v)) for AdjList, O(e) for EdgeList
 		if (unityComponents.getSetCount() == 1)
 			return true;
 		int connectedComponent = -1; // запомним ту компоненту, которой можно иметь ребра
@@ -145,7 +145,7 @@ vector<int> Algorithm::getEuleranTourFleri(const AdjacencyMatrix * graph)
 	vector<int> tour;
 	bool isEuleranCircle;
 	int tourStart;
-	if (!checkEuler(graph, isEuleranCircle, tourStart))
+	if (!checkEuler(graph, isEuleranCircle, tourStart)) // O(v^2) 
 		return tour;
 	if (isEuleranCircle)
 		tourStart = 0;
@@ -158,7 +158,7 @@ vector<int> Algorithm::getEuleranTourFleri(const AdjacencyMatrix * graph)
 	while (copy.hasEdges()) {
 		for (int to = 0; to < graph->vertexCount; ++to) {
 			if (copy.adjacencyMatrix[currentVertex][to])
-				if (copy.isBridge(currentVertex, to))
+				if (copy.isBridge(currentVertex, to)) // O(v^2)
 					bridgeVertex = to;
 				else {
 					nextVertex = to;
@@ -169,7 +169,7 @@ vector<int> Algorithm::getEuleranTourFleri(const AdjacencyMatrix * graph)
 		if (nextVertex < 0)
 			nextVertex = bridgeVertex;
 		tour.push_back(nextVertex);
-		copy.removeEdge(currentVertex, nextVertex);
+		copy.removeEdge(currentVertex, nextVertex); // O(1)
 		currentVertex = nextVertex;
 		nextVertex = bridgeVertex = -1;
 	}
@@ -181,7 +181,7 @@ vector<int> Algorithm::getEuleranTourFleri(const AdjacencyList * graph)
 	vector<int> tour;
 	bool isEuleranCircle;
 	int tourStart;
-	if (!checkEuler(graph, isEuleranCircle, tourStart))
+	if (!checkEuler(graph, isEuleranCircle, tourStart)) // O(v*log(v))
 		return tour;
 	if (isEuleranCircle)
 		tourStart = 0;
@@ -194,7 +194,7 @@ vector<int> Algorithm::getEuleranTourFleri(const AdjacencyList * graph)
 	while (copy.hasEdges()) {
 		if (copy.isWeighted) {
 			for (const auto & adjacency : copy.weightedAdjacencyList[currentVertex])
-				if (copy.isBridge(currentVertex, adjacency.first))
+				if (copy.isBridge(currentVertex, adjacency.first)) // O(v*log(v))
 					bridgeVertex = adjacency.first;
 				else {
 					nextVertex = adjacency.first;
@@ -214,7 +214,7 @@ vector<int> Algorithm::getEuleranTourFleri(const AdjacencyList * graph)
 		if (nextVertex < 0)
 			nextVertex = bridgeVertex;
 		tour.push_back(nextVertex);
-		copy.removeEdge(currentVertex, nextVertex);
+		copy.removeEdge(currentVertex, nextVertex); // O(logv)
 		currentVertex = nextVertex;
 		nextVertex = bridgeVertex = -1;
 	}
@@ -226,7 +226,7 @@ vector<int> Algorithm::getEuleranTourFleri(const EdgeList * graph)
 	vector<int> tour;
 	bool isEuleranCircle;
 	int tourStart;
-	if (!checkEuler(graph, isEuleranCircle, tourStart))
+	if (!checkEuler(graph, isEuleranCircle, tourStart)) // O(max(v,e))
 		return tour;
 	if (isEuleranCircle)
 		tourStart = 0;
@@ -238,10 +238,10 @@ vector<int> Algorithm::getEuleranTourFleri(const EdgeList * graph)
 	int nextVertex = -1;
 	while (copy.hasEdges()) {
 		if (copy.isWeighted) {
-			auto edge = copy.weightedEdgeList.lower_bound(make_tuple(currentVertex, 0, 0));
+			auto edge = copy.weightedEdgeList.lower_bound(make_tuple(currentVertex, 0, 0)); // log(e)
 			while (edge != copy.weightedEdgeList.end() && get<0>(*edge) == currentVertex) {
 				int to = get<1>(*edge);
-				if (copy.isBridge(currentVertex, to))
+				if (copy.isBridge(currentVertex, to)) // O(e)
 					bridgeVertex = to;
 				else {
 					nextVertex = to;
@@ -260,7 +260,6 @@ vector<int> Algorithm::getEuleranTourFleri(const EdgeList * graph)
 					nextVertex = to;
 					break;
 				}
-				edge = copy.edgeList.lower_bound(make_pair(currentVertex, 0));
 				++edge;
 			}
 		}

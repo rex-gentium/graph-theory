@@ -3,11 +3,11 @@
 int main() {
 	Graph graph;
 
-	graph.readGraph("D:\\test_graph.txt");
+	graph.readGraph("C:\\dump\\test_adjList.txt");
 	
 	vector<int> tour = graph.getEuleranTourFleri();
 	
-	graph.writeGraph("D:\\output_graph.txt");
+	//graph.writeGraph("D:\\output_graph.txt");
 	
 	return 0;
 }

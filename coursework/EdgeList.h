@@ -36,5 +36,7 @@ public:
 private:
 	set<pair<int, int>> edgeList;
 	set<tuple<int, int, int>> weightedEdgeList;
+
+	DSU getUnityComponents(int exceptFrom, int exceptTo) const override;
 };
 

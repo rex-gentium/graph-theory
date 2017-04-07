@@ -36,5 +36,7 @@ public:
 
 private:
 	vector<vector<int>> adjacencyMatrix;
+
+	DSU getUnityComponents(int exceptFrom, int exceptTo) const override;
 };
 
