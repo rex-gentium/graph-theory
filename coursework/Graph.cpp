@@ -127,29 +127,45 @@ void Graph::writeGraph(const string fileName) {
 
 Graph Graph::getSpaingTreePrima() {
 	Graph result;
-	result.currentRepr = this->currentRepr;
+	
 	if (content->isDirected || !content->isWeighted) 
 		return result; // бессмысленная операция
 	result.content = Algorithm::getSpaingTreePrima(this->content);
+	if (dynamic_cast<AdjacencyMatrix*>(result.content))
+		result.currentRepr = ADJMATRIX;
+	else if (dynamic_cast<AdjacencyList*>(result.content))
+		result.currentRepr = ADJLIST;
+	else if (dynamic_cast<EdgeList*>(result.content))
+		result.currentRepr = EDGELIST;
 	return result;
 }
 
 Graph Graph::getSpaingTreeKruscal()
 {
 	Graph result;
-	result.currentRepr = this->currentRepr;
 	if (content->isDirected || !content->isWeighted)
 		return result; // бессмысленная операция
 	result.content = Algorithm::getSpaingTreeKruscal(this->content);
+	if (dynamic_cast<AdjacencyMatrix*>(result.content))
+		result.currentRepr = ADJMATRIX;
+	else if (dynamic_cast<AdjacencyList*>(result.content))
+		result.currentRepr = ADJLIST;
+	else if (dynamic_cast<EdgeList*>(result.content))
+		result.currentRepr = EDGELIST;
 	return result;
 }
 
 Graph Graph::getSpaingTreeBoruvka()
 {
 	Graph result;
-	result.currentRepr = this->currentRepr;
 	if (content->isDirected || !content->isWeighted)
 		return result; // бессмысленная операция
 	result.content = Algorithm::getSpaingTreeBoruvka(this->content);
+	if (dynamic_cast<AdjacencyMatrix*>(result.content))
+		result.currentRepr = ADJMATRIX;
+	else if (dynamic_cast<AdjacencyList*>(result.content))
+		result.currentRepr = ADJLIST;
+	else if (dynamic_cast<EdgeList*>(result.content))
+		result.currentRepr = EDGELIST;
 	return result;
 }
