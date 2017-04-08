@@ -9,7 +9,7 @@ class Graph {
 public:
 	enum RepresentationType { NONE, ADJMATRIX, ADJLIST, EDGELIST };
 	Graph();
-	Graph(int vertexCount);
+	//Graph(int vertexCount);
 	~Graph();
 
 	// note: воспримет ориентированный граф без петель и симметричной матрицей как неориентированный

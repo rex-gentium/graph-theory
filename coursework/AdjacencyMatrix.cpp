@@ -78,7 +78,7 @@ list<tuple<int, int, int>> AdjacencyMatrix::getWeightedEdgesList() const
 {
 	list<tuple<int, int, int>> result;
 	for (int i = 0; i < vertexCount; ++i)
-		for (int j = (isDirected ? 0 : i + 1); j < vertexCount; ++j) {
+		for (int j = (isDirected ? 0 : i); j < vertexCount; ++j) {
 			if (adjacencyMatrix[i][j])
 				result.push_back(make_tuple(i, j, adjacencyMatrix[i][j]));
 		}
@@ -90,7 +90,7 @@ tuple<int, int, int> AdjacencyMatrix::findMinEdge(bool * isMarked) const
 	int minWeight = INT_MAX, minI = -1, minJ = -1;
 	for (int i = 0; i < vertexCount; i++) {
 		if (!isMarked[i]) continue;
-		for (int j = i + 1; j < vertexCount; j++) {
+		for (int j = i; j < vertexCount; j++) {
 			if (isMarked[j]) continue;
 			if (adjacencyMatrix[i][j] != 0 && adjacencyMatrix[i][j] < minWeight) {
 				minWeight = adjacencyMatrix[i][j];

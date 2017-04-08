@@ -9,13 +9,16 @@
 #include <sstream>
 #include <tuple>
 
-Graph::Graph() {}
+Graph::Graph() {
+	content = nullptr;
+	currentRepr = NONE;
+}
 
-Graph::Graph(int vertexCount) {
+/*Graph::Graph(int vertexCount) {
 	content = new AdjacencyMatrix(vertexCount);
 	content->isDirected = false;
 	content->isWeighted = true;
-}
+}*/
 
 Graph::~Graph() {}
 
@@ -123,7 +126,8 @@ void Graph::writeGraph(const string fileName) {
 }
 
 Graph Graph::getSpaingTreePrima() {
-	Graph result(content->vertexCount);
+	Graph result;
+	result.currentRepr = this->currentRepr;
 	if (content->isDirected || !content->isWeighted) 
 		return result; // бессмысленная операция
 	result.content = Algorithm::getSpaingTreePrima(this->content);
@@ -132,7 +136,8 @@ Graph Graph::getSpaingTreePrima() {
 
 Graph Graph::getSpaingTreeKruscal()
 {
-	Graph result(content->vertexCount);
+	Graph result;
+	result.currentRepr = this->currentRepr;
 	if (content->isDirected || !content->isWeighted)
 		return result; // бессмысленная операция
 	result.content = Algorithm::getSpaingTreeKruscal(this->content);
@@ -141,7 +146,8 @@ Graph Graph::getSpaingTreeKruscal()
 
 Graph Graph::getSpaingTreeBoruvka()
 {
-	Graph result(content->vertexCount);
+	Graph result;
+	result.currentRepr = this->currentRepr;
 	if (content->isDirected || !content->isWeighted)
 		return result; // бессмысленная операция
 	result.content = Algorithm::getSpaingTreeBoruvka(this->content);
