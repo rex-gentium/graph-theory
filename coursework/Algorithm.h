@@ -6,7 +6,7 @@
 class Algorithm {
 public:
 	static GraphContent* getSpaingTreePrima(const GraphContent * graph);		// O(v^2)
-	static GraphContent* getSpaingTreeKruscal(const GraphContent * graph);		// O(v*log(v))
+	static GraphContent* getSpaingTreeKruscal(EdgeList * graph);				// O(e*log(e))
 	static GraphContent* getSpaingTreeBoruvka(const GraphContent * graph);		// O(e*log(v))
 };
 

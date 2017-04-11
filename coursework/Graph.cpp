@@ -20,7 +20,16 @@ Graph::Graph() {
 	content->isWeighted = true;
 }*/
 
-Graph::~Graph() {}
+Graph::~Graph() {
+}
+
+Graph & Graph::operator=(const Graph & rhs)
+{
+	currentRepr = rhs.currentRepr;
+	delete content;
+	content = rhs.content;
+	return *this;
+}
 
 void Graph::readGraph(const string fileName) {
 	ifstream inpFile;
@@ -70,9 +79,9 @@ void Graph::transformToAdjList() {
 	
 	switch (currentRepr) {
 	case ADJMATRIX: 
-		isTransformed = GraphTrasformer::transferContent(dynamic_cast<AdjacencyMatrix*>(content), adjListRepr);
+		isTransformed = GraphTrasformer::transferContent(dynamic_cast<AdjacencyMatrix*>(content), adjListRepr); break;
 	case EDGELIST: 
-		isTransformed = GraphTrasformer::transferContent(dynamic_cast<EdgeList*>(content), adjListRepr);
+		isTransformed = GraphTrasformer::transferContent(dynamic_cast<EdgeList*>(content), adjListRepr); break;
 	}
 
 	if (isTransformed) {
@@ -88,9 +97,9 @@ void Graph::transformToAdjMatrix() {
 	
 	switch (currentRepr) {
 	case ADJLIST:
-		isTransformed = GraphTrasformer::transferContent(dynamic_cast<AdjacencyList*>(content), adjMatrixRepr);
+		isTransformed = GraphTrasformer::transferContent(dynamic_cast<AdjacencyList*>(content), adjMatrixRepr); break;
 	case EDGELIST:
-		isTransformed = GraphTrasformer::transferContent(dynamic_cast<EdgeList*>(content), adjMatrixRepr);
+		isTransformed = GraphTrasformer::transferContent(dynamic_cast<EdgeList*>(content), adjMatrixRepr); break;
 	}
 	
 	if (isTransformed) {
@@ -106,9 +115,9 @@ void Graph::transformToListOfEdges() {
 
 	switch (currentRepr) {
 	case ADJMATRIX:
-		isTransformed = GraphTrasformer::transferContent(dynamic_cast<AdjacencyMatrix*>(content), edgeListRepr);
+		isTransformed = GraphTrasformer::transferContent(dynamic_cast<AdjacencyMatrix*>(content), edgeListRepr); break;
 	case ADJLIST:
-		isTransformed = GraphTrasformer::transferContent(dynamic_cast<AdjacencyList*>(content), edgeListRepr);
+		isTransformed = GraphTrasformer::transferContent(dynamic_cast<AdjacencyList*>(content), edgeListRepr); break;
 	}
 
 	if (isTransformed) {
@@ -145,13 +154,20 @@ Graph Graph::getSpaingTreeKruscal()
 	Graph result;
 	if (content->isDirected || !content->isWeighted)
 		return result; // бессмысленная операция
-	result.content = Algorithm::getSpaingTreeKruscal(this->content);
+	RepresentationType repr = this->currentRepr;
+	transformToListOfEdges();
+	result.content = Algorithm::getSpaingTreeKruscal(dynamic_cast<EdgeList *>(content));
 	if (dynamic_cast<AdjacencyMatrix*>(result.content))
 		result.currentRepr = ADJMATRIX;
 	else if (dynamic_cast<AdjacencyList*>(result.content))
 		result.currentRepr = ADJLIST;
 	else if (dynamic_cast<EdgeList*>(result.content))
 		result.currentRepr = EDGELIST;
+	// back transform
+	switch (repr) {
+	case ADJMATRIX: transformToAdjMatrix(); break;
+	case ADJLIST: transformToAdjList();  break;
+	}
 	return result;
 }
 

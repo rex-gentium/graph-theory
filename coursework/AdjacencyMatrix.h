@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "GraphContent.h"
 #include <vector>
 
@@ -24,7 +24,17 @@ public:
 	/* O(v^2) */
 	tuple<int, int, int> findMinEdge(bool * isMarked) const override;
 
+	ConstEdgeIterator& edgeBegin() const override;
+	ConstEdgeIterator& edgeEnd() const override;
+	
 private:
 	vector<vector<int>> adjacencyMatrix;
+
+	class AdjMatrixEdgeIterator : public ConstEdgeIterator {
+	public:
+		AdjMatrixEdgeIterator(AdjacencyMatrix * graph, int from, int to, int weight = -1) : ConstEdgeIterator(graph, from, to, weight) {}
+	};
+
+	tuple<int, int, int> nextEdge(ConstEdgeIterator & iterator) const override;
 };
 

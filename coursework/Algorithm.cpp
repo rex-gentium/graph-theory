@@ -4,7 +4,8 @@
 #include <map>
 
 GraphContent * Algorithm::getSpaingTreePrima(const GraphContent * graph) {
-	AdjacencyMatrix* result = new AdjacencyMatrix(graph->vertexCount);
+	GraphContent * result = new EdgeList;
+	result->vertexCount = graph->vertexCount;
 	result->isDirected = graph->isDirected;
 	result->isWeighted = graph->isWeighted;
 	bool * isMarked = new bool[graph->vertexCount];
@@ -21,8 +22,7 @@ GraphContent * Algorithm::getSpaingTreePrima(const GraphContent * graph) {
 			result->addEdge(from, to, weight);
 			isMarked[from] = isMarked[to] = true;
 		}
-		else {
-			// если не нашли никакого ребра, помечаем любую недостижимую вершину
+		else { // если не нашли никакого ребра, помечаем любую недостижимую вершину
 			for (int i = 0; i < graph->vertexCount; i++)
 				if (!isMarked[i]) {
 					isMarked[i] = true;
@@ -42,33 +42,50 @@ GraphContent * Algorithm::getSpaingTreePrima(const GraphContent * graph) {
 }
 
 /* компаратор ребёр по весам */
-bool compareWeight(const tuple<int, int, int> leftEdge, const tuple<int, int, int> rightEdge) {
-	return get<2>(leftEdge) < get<2>(rightEdge);
-}
+struct compareWeight {
+	bool operator() (const tuple<int, int, int> & leftEdge, const tuple<int, int, int> & rightEdge) const {
+		// сначала по весам
+		int leftWeight = get<2>(leftEdge), rightWeight = get<2>(rightEdge);
+		if (leftWeight != rightWeight)
+			return leftWeight < rightWeight;
+		else { // потом лексигорафически
+			int leftFrom = get<0>(leftEdge), rightFrom = get<0>(rightEdge);
+			if (leftFrom != rightFrom)
+				return leftFrom < rightFrom;
+			else {
+				int leftTo = get<1>(leftEdge), rightTo = get<1>(rightEdge);
+				return leftTo < rightTo;
+			}
+		}
+	}
+};
 
-GraphContent * Algorithm::getSpaingTreeKruscal(const GraphContent * graph) {
+GraphContent * Algorithm::getSpaingTreeKruscal(EdgeList * graph) {
 	EdgeList* result = new EdgeList();
 	result->isDirected = graph->isDirected;
 	result->isWeighted = graph->isWeighted;
 	result->vertexCount = graph->vertexCount;
-	
-	list<tuple<int, int, int>> edges = graph->getWeightedEdgesList(); // O(e*v) for adjlist, O(v^2) for adjmatrix, O(e) for edgelist
 	// сортировка рёбер e*log(e)
-	edges.sort(compareWeight);
+	set<tuple<int, int, int>, compareWeight> sortedEdges;
+	while (!graph->weightedEdgeList.empty()) {
+		auto edge = graph->weightedEdgeList.begin();
+		sortedEdges.insert(*edge);
+		graph->weightedEdgeList.erase(edge);
+	}
 	// распределение по компонентам связности
 	DSU components(graph->vertexCount);
-	while (!edges.empty()) {
-		auto edge = edges.front();
+	while (!sortedEdges.empty()) {
+		auto edge = *sortedEdges.begin();
 		int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
 		int leftComponent = components.find(from);
 		int rightComponent = components.find(to);
 		if (leftComponent != rightComponent) {
 			// добавление ребра не образует цикл
-			result->addEdge(to, from, weight);
+			result->addEdge(from, to, weight);
 			components.unite(leftComponent, rightComponent);
 		}
-		// если добавление ребра образует цикл, оно непригодно для постройки остова
-		edges.pop_front();
+		graph->weightedEdgeList.insert(edge);
+		sortedEdges.erase(edge);
 	}
 	return result;
 }
@@ -81,28 +98,27 @@ GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 	result->vertexCount = graph->vertexCount;
 
 	DSU components(graph->vertexCount);
-	auto edges = graph->getWeightedEdgesList();
-	map<int, tuple<int, int, int>*> edgesToAdd;
+	map<int, tuple<int, int, int>> edgesToAdd; // к какой компоненте связности какое ребро пришивать
 	
 	while (components.getSetCount() > 1) {
 		// на каждой итерации будем добавлять к каждой из компонент по ребру
 		// ищем среди ребер минимальные, связующие разные компоненты
-		for (auto & edge : edges) {
-			int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
+		for (auto & edge = graph->edgeBegin(); edge != graph->edgeEnd(); ++edge) {
+			int from = edge.from(), to = edge.to(), weight = edge.weight();
 			int fromComponent = components.find(from);
 			int toComponent = components.find(to);
 			if (fromComponent != toComponent) {
-				int currWeight = (edgesToAdd.find(fromComponent) != edgesToAdd.end()) ? get<2>(*edgesToAdd[fromComponent]) : INT_MAX;
+				int currWeight = (edgesToAdd.find(fromComponent) != edgesToAdd.end()) ? get<2>(edgesToAdd[fromComponent]) : INT_MAX;
 				if (weight < currWeight)
-					edgesToAdd[fromComponent] = &edge;
-				currWeight = (edgesToAdd.find(toComponent) != edgesToAdd.end()) ? get<2>(*edgesToAdd[toComponent]) : INT_MAX;
+					edgesToAdd[fromComponent] = *edge; // !
+				currWeight = (edgesToAdd.find(toComponent) != edgesToAdd.end()) ? get<2>(edgesToAdd[toComponent]) : INT_MAX;
 				if (weight < currWeight)
-					edgesToAdd[toComponent] = &edge;
+					edgesToAdd[toComponent] = *edge;
 			}
 		}
 		bool didEdgeAdding = false;
 		for (auto & edge : edgesToAdd) {
-			int from = get<0>(*edge.second), to = get<1>(*edge.second), weight = get<2>(*edge.second);
+			int from = get<0>(edge.second), to = get<1>(edge.second), weight = get<2>(edge.second);
 			//if (from < 0 || to < 0) continue;
 			result->addEdge(from, to, weight);
 			components.unite(from, to);

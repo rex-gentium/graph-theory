@@ -146,7 +146,7 @@ void AdjacencyList::removeEdge(int from, int to) {
 list<tuple<int, int, int>> AdjacencyList::getWeightedEdgesList() const
 {
 	list<tuple<int, int, int>> result;
-	for (int from = 0; from < weightedAdjacencyList.size(); ++from)
+	for (int from = 0; from < vertexCount; ++from)
 		for (const auto & adjacency : weightedAdjacencyList[from]) {
 			int to = adjacency.first;
 			int weight = adjacency.second;
@@ -174,3 +174,100 @@ tuple<int, int, int> AdjacencyList::findMinEdge(bool * isMarked) const
 	}
 	return make_tuple(minI, minJ, minWeight);
 }
+
+GraphContent::ConstEdgeIterator& AdjacencyList::edgeBegin() const
+{
+	if (isWeighted) {
+		for (int from = 0; from < vertexCount; ++from)
+			if (!weightedAdjacencyList[from].empty()) {
+				AdjListEdgeIterator * kek = new AdjListEdgeIterator(this, from,
+					AdjListEdgeIterator::InnerWeightedIterator(weightedAdjacencyList[from].cbegin()));
+				ConstEdgeIterator * lel = dynamic_cast<ConstEdgeIterator*>(kek);
+				return *lel;
+			}
+	}
+	else {
+		for (int from = 0; from < vertexCount; ++from)
+			if (!adjacencyList[from].empty())
+				return *new AdjListEdgeIterator(this, from, 
+					AdjListEdgeIterator::InnerIterator(adjacencyList[from].cbegin()));
+	}
+	return edgeEnd();
+}
+
+GraphContent::ConstEdgeIterator& AdjacencyList::edgeEnd() const
+{
+	return (isWeighted) 
+		? *new AdjListEdgeIterator(this, -1, AdjListEdgeIterator::InnerWeightedIterator::null())
+		: *new AdjListEdgeIterator(this, -1, AdjListEdgeIterator::InnerIterator::null());
+}
+
+tuple<int, int, int> AdjacencyList::nextEdge(ConstEdgeIterator & iterator) const
+{
+	AdjListEdgeIterator& edgeIt = dynamic_cast<AdjListEdgeIterator&>(iterator);
+	AdjListEdgeIterator::InnerIterator innerIt = edgeIt.inner();
+	if (!innerIt.isNull())
+		return nextEdge(iterator.from(), innerIt);
+	AdjListEdgeIterator::InnerWeightedIterator& innerWIt = edgeIt.innerWeighted();
+	if (!innerWIt.isNull())
+		return nextEdge(iterator.from(), innerWIt);
+	return make_tuple(-1, -1, -1);
+}
+
+tuple<int, int, int> AdjacencyList::nextEdge(int fromV, AdjListEdgeIterator::InnerIterator & iterator) const
+{
+	// идем дальше по текущему списку смежности
+	if (++iterator != adjacencyList[fromV].cend())
+		return make_tuple(fromV, *iterator, -1);
+	else { // переходим в следующий список смежности
+		if (++fromV < vertexCount) {
+			iterator = adjacencyList[fromV].cbegin();
+			return make_tuple(fromV, *iterator, -1);
+		}
+		else { // конец коллекции
+			iterator = AdjListEdgeIterator::InnerIterator::null();
+			return make_tuple(-1, -1, -1);
+		}
+	}
+}
+
+tuple<int, int, int> AdjacencyList::nextEdge(int fromV, AdjListEdgeIterator::InnerWeightedIterator & iterator) const
+{
+	// идем дальше по текущему списку смежности
+	if (++iterator != weightedAdjacencyList[fromV].cend())
+		return make_tuple(fromV, iterator->first, iterator->second);
+	else { // переходим в следующий список смежности
+		if (++fromV < vertexCount) {
+			iterator = weightedAdjacencyList[fromV].cbegin();
+			return make_tuple(fromV, iterator->first, iterator->second);
+		}
+		else { // конец коллекции
+			iterator = AdjListEdgeIterator::InnerWeightedIterator::null();
+			return make_tuple(-1, -1, -1);
+		}
+	}
+}
+
+AdjacencyList::AdjListEdgeIterator::AdjListEdgeIterator(const AdjacencyList * graph, int fromV, InnerIterator it) :
+	ConstEdgeIterator(graph, fromV, !it.isNull() ? *it : -1),
+	adjList(graph),
+	it(it),
+	wIt(AdjListEdgeIterator::InnerWeightedIterator::null())
+{}
+
+AdjacencyList::AdjListEdgeIterator::AdjListEdgeIterator(const AdjacencyList * graph, int fromV, InnerWeightedIterator it) :
+	ConstEdgeIterator(graph, fromV,
+		(!it.isNull()) ? it->first : -1,
+		(!it.isNull()) ? it->second : -1),
+	adjList(graph),
+	it(AdjListEdgeIterator::InnerIterator::null()),
+	wIt(it)
+{}
+
+/*void AdjacencyList::AdjListEdgeIterator::operator++()
+{
+	if (*this != graph->edgeEnd())
+		edge = (graph->isWeighted)
+			? adjList->nextEdge(get<0>(edge), wIt)
+			: adjList->nextEdge(get<0>(edge), it);
+}*/
