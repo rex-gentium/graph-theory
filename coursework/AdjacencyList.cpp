@@ -180,10 +180,8 @@ GraphContent::ConstEdgeIterator& AdjacencyList::edgeBegin() const
 	if (isWeighted) {
 		for (int from = 0; from < vertexCount; ++from)
 			if (!weightedAdjacencyList[from].empty()) {
-				AdjListEdgeIterator * kek = new AdjListEdgeIterator(this, from,
+				return *new AdjListEdgeIterator(this, from,
 					AdjListEdgeIterator::InnerWeightedIterator(weightedAdjacencyList[from].cbegin()));
-				ConstEdgeIterator * lel = dynamic_cast<ConstEdgeIterator*>(kek);
-				return *lel;
 			}
 	}
 	else {

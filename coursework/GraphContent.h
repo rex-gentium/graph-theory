@@ -37,8 +37,10 @@ public:
 		virtual ~ConstEdgeIterator() {}
 		tuple<int, int, int> operator*() const { return (*this != graph->edgeEnd()) ? edge : make_tuple(-1,-1,-1); }
 		ConstEdgeIterator& operator++() { 
-			if (*this != graph->edgeEnd()) 
-				edge = graph->nextEdge(*this); 
+			if (*this != graph->edgeEnd()) {
+				delete &edge;
+				edge = graph->nextEdge(*this);
+			}
 			return *this; }
 		bool operator==(const ConstEdgeIterator & rhs) const { return graph == rhs.graph && edge == rhs.edge; }
 		bool operator!=(const ConstEdgeIterator & rhs) const { return !(*this == rhs); }

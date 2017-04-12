@@ -104,7 +104,7 @@ GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 		// на каждой итерации будем добавлять к каждой из компонент по ребру
 		// ищем среди ребер минимальные, связующие разные компоненты
 		for (auto & edge = graph->edgeBegin(); edge != graph->edgeEnd(); ++edge) {
-			int from = edge.from(), to = edge.to(), weight = edge.weight();
+			/*int from = edge.from(), to = edge.to(), weight = edge.weight();
 			int fromComponent = components.find(from);
 			int toComponent = components.find(to);
 			if (fromComponent != toComponent) {
@@ -114,7 +114,7 @@ GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 				currWeight = (edgesToAdd.find(toComponent) != edgesToAdd.end()) ? get<2>(edgesToAdd[toComponent]) : INT_MAX;
 				if (weight < currWeight)
 					edgesToAdd[toComponent] = *edge;
-			}
+			}*/
 		}
 		bool didEdgeAdding = false;
 		for (auto & edge : edgesToAdd) {

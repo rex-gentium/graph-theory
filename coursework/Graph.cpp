@@ -21,13 +21,23 @@ Graph::Graph() {
 }*/
 
 Graph::~Graph() {
+	if (content != nullptr)
+		delete content;
 }
 
 Graph & Graph::operator=(const Graph & rhs)
 {
+	// assignment operator always creates a copy, it's a c++ contract, we can't avoid creating another graph here
 	currentRepr = rhs.currentRepr;
-	delete content;
-	content = rhs.content;
+	if (content == rhs.content)
+		return *this;
+	if (content != nullptr)
+		delete content;
+	switch (rhs.currentRepr) {
+	case ADJMATRIX: content = new AdjacencyMatrix(*dynamic_cast<AdjacencyMatrix*>(rhs.content)); break;
+	case ADJLIST: content = new AdjacencyList(*dynamic_cast<AdjacencyList*>(rhs.content)); break;
+	case EDGELIST: content = new EdgeList(*dynamic_cast<EdgeList*>(rhs.content)); break;
+	}
 	return *this;
 }
 
@@ -135,53 +145,52 @@ void Graph::writeGraph(const string fileName) {
 }
 
 Graph Graph::getSpaingTreePrima() {
-	Graph result;
-	
+	Graph * result = new Graph();
 	if (content->isDirected || !content->isWeighted) 
-		return result; // бессмысленная операция
-	result.content = Algorithm::getSpaingTreePrima(this->content);
-	if (dynamic_cast<AdjacencyMatrix*>(result.content))
-		result.currentRepr = ADJMATRIX;
-	else if (dynamic_cast<AdjacencyList*>(result.content))
-		result.currentRepr = ADJLIST;
-	else if (dynamic_cast<EdgeList*>(result.content))
-		result.currentRepr = EDGELIST;
-	return result;
+		return *result; // бессмысленная операция
+	result->content = Algorithm::getSpaingTreePrima(this->content);
+	if (dynamic_cast<AdjacencyMatrix*>(result->content))
+		result->currentRepr = ADJMATRIX;
+	else if (dynamic_cast<AdjacencyList*>(result->content))
+		result->currentRepr = ADJLIST;
+	else if (dynamic_cast<EdgeList*>(result->content))
+		result->currentRepr = EDGELIST;
+	return *result;
 }
 
 Graph Graph::getSpaingTreeKruscal()
 {
-	Graph result;
+	Graph * result = new Graph();
 	if (content->isDirected || !content->isWeighted)
-		return result; // бессмысленная операция
+		return *result; // бессмысленная операция
 	RepresentationType repr = this->currentRepr;
 	transformToListOfEdges();
-	result.content = Algorithm::getSpaingTreeKruscal(dynamic_cast<EdgeList *>(content));
-	if (dynamic_cast<AdjacencyMatrix*>(result.content))
-		result.currentRepr = ADJMATRIX;
-	else if (dynamic_cast<AdjacencyList*>(result.content))
-		result.currentRepr = ADJLIST;
-	else if (dynamic_cast<EdgeList*>(result.content))
-		result.currentRepr = EDGELIST;
+	result->content = Algorithm::getSpaingTreeKruscal(dynamic_cast<EdgeList *>(content));
+	if (dynamic_cast<AdjacencyMatrix*>(result->content))
+		result->currentRepr = ADJMATRIX;
+	else if (dynamic_cast<AdjacencyList*>(result->content))
+		result->currentRepr = ADJLIST;
+	else if (dynamic_cast<EdgeList*>(result->content))
+		result->currentRepr = EDGELIST;
 	// back transform
 	switch (repr) {
 	case ADJMATRIX: transformToAdjMatrix(); break;
 	case ADJLIST: transformToAdjList();  break;
 	}
-	return result;
+	return *result;
 }
 
 Graph Graph::getSpaingTreeBoruvka()
 {
-	Graph result;
+	Graph * result = new Graph();
 	if (content->isDirected || !content->isWeighted)
-		return result; // бессмысленная операция
-	result.content = Algorithm::getSpaingTreeBoruvka(this->content);
-	if (dynamic_cast<AdjacencyMatrix*>(result.content))
-		result.currentRepr = ADJMATRIX;
-	else if (dynamic_cast<AdjacencyList*>(result.content))
-		result.currentRepr = ADJLIST;
-	else if (dynamic_cast<EdgeList*>(result.content))
-		result.currentRepr = EDGELIST;
-	return result;
+		return *result; // бессмысленная операция
+	result->content = Algorithm::getSpaingTreeBoruvka(this->content);
+	if (dynamic_cast<AdjacencyMatrix*>(result->content))
+		result->currentRepr = ADJMATRIX;
+	else if (dynamic_cast<AdjacencyList*>(result->content))
+		result->currentRepr = ADJLIST;
+	else if (dynamic_cast<EdgeList*>(result->content))
+		result->currentRepr = EDGELIST;
+	return *result;
 }
