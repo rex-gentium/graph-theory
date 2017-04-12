@@ -90,7 +90,7 @@ GraphContent * Algorithm::getSpaingTreeKruscal(EdgeList * graph) {
 	return result;
 }
 
-GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
+GraphContent * Algorithm::getSpaingTreeBoruvka(const EdgeList * graph)
 {
 	EdgeList * result = new EdgeList;
 	result->isDirected = graph->isDirected;
@@ -103,8 +103,8 @@ GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 	while (components.getSetCount() > 1) {
 		// на каждой итерации будем добавлять к каждой из компонент по ребру
 		// ищем среди ребер минимальные, связующие разные компоненты
-		for (auto & edge = graph->edgeBegin(); edge != graph->edgeEnd(); ++edge) {
-			/*int from = edge.from(), to = edge.to(), weight = edge.weight();
+		for (auto edge = graph->weightedEdgeList.begin(); edge != graph->weightedEdgeList.end(); ++edge) {
+			int from = get<0>(*edge), to = get<1>(*edge), weight = get<2>(*edge);
 			int fromComponent = components.find(from);
 			int toComponent = components.find(to);
 			if (fromComponent != toComponent) {
@@ -114,7 +114,7 @@ GraphContent * Algorithm::getSpaingTreeBoruvka(const GraphContent * graph)
 				currWeight = (edgesToAdd.find(toComponent) != edgesToAdd.end()) ? get<2>(edgesToAdd[toComponent]) : INT_MAX;
 				if (weight < currWeight)
 					edgesToAdd[toComponent] = *edge;
-			}*/
+			}
 		}
 		bool didEdgeAdding = false;
 		for (auto & edge : edgesToAdd) {

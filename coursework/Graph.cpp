@@ -185,12 +185,19 @@ Graph Graph::getSpaingTreeBoruvka()
 	Graph * result = new Graph();
 	if (content->isDirected || !content->isWeighted)
 		return *result; // бессмысленная операция
-	result->content = Algorithm::getSpaingTreeBoruvka(this->content);
+	RepresentationType repr = this->currentRepr;
+	transformToListOfEdges();
+	result->content = Algorithm::getSpaingTreeBoruvka(dynamic_cast<EdgeList *>(content));
 	if (dynamic_cast<AdjacencyMatrix*>(result->content))
 		result->currentRepr = ADJMATRIX;
 	else if (dynamic_cast<AdjacencyList*>(result->content))
 		result->currentRepr = ADJLIST;
 	else if (dynamic_cast<EdgeList*>(result->content))
 		result->currentRepr = EDGELIST;
+	// back transform
+	switch (repr) {
+	case ADJMATRIX: transformToAdjMatrix(); break;
+	case ADJLIST: transformToAdjList();  break;
+	}
 	return *result;
 }

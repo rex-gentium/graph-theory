@@ -101,37 +101,3 @@ tuple<int, int, int> AdjacencyMatrix::findMinEdge(bool * isMarked) const
 	}
 	return make_tuple(minI, minJ, minWeight);
 }
-
-GraphContent::ConstEdgeIterator& AdjacencyMatrix::edgeBegin() const
-{
-	ConstEdgeIterator * result = &edgeEnd();
-	for (int i = 0; i < vertexCount; ++i)
-		for (int j = (isDirected) ? 0 : i; j < vertexCount; ++j)
-			if (adjacencyMatrix[i][j]) {
-				//delete result;
-				int weight = (isWeighted) ? adjacencyMatrix[i][j] : -1;
-				result = new ConstEdgeIterator(this, i, j, weight);
-				return *result;
-			}
-	return *result;
-}
-
-GraphContent::ConstEdgeIterator& AdjacencyMatrix::edgeEnd() const
-{
-	return *new ConstEdgeIterator(this, -1, -1, -1);
-}
-
-tuple<int, int, int> AdjacencyMatrix::nextEdge(ConstEdgeIterator & iterator) const
-{
-	int from = iterator.from(), to = iterator.to();
-	// сначала просматриваем текущую строку
-	for (int j = to + 1; j < vertexCount; ++j)
-		if (adjacencyMatrix[from][j])
-			return make_tuple(from, j, (isWeighted) ? adjacencyMatrix[from][j] : -1);
-	// потом уже ищем как обычно
-	for (int i = from + 1; i < vertexCount; ++i)
-		for (int j = (isDirected) ? 0 : i; j < vertexCount; ++j)
-			if (adjacencyMatrix[i][j])
-				return make_tuple(i, j, (isWeighted) ? adjacencyMatrix[i][j] : -1);
-	return make_tuple(-1, -1, -1);
-}
