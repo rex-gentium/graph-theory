@@ -258,5 +258,20 @@ int Graph::checkBipart(vector<char>& marks)
 
 vector<pair<int, int>> Graph::getMaximumMatchingBipart()
 {
-	return vector<pair<int, int>>();
+	vector<pair<int, int>> result;
+	if (content->vertexCount <= 1)
+		return result;
+	RepresentationType lastRepr = this->currentRepr;
+	this->transformToAdjList();
+	result = Algorithm::getMaximumMatchingBipart(dynamic_cast<AdjacencyList *>(content));
+	// back transform
+	switch (lastRepr) {
+	case ADJMATRIX: transformToAdjMatrix(); break;
+	case EDGELIST: transformToListOfEdges(); break;
+	}
+	// поправка на нумерацию
+	for (int i = 0; i < result.size(); ++i) {
+		++result[i].first; ++result[i].second;
+	}
+	return result;
 }

@@ -15,11 +15,17 @@ public:
 	static vector<int> getEuleranTourFleri(EdgeList * graph);			// O(e^2)
 	// паросочетания
 	static bool checkBipart(const AdjacencyList * graph, char * marks);
+	static vector<pair<int, int>> getMaximumMatchingBipart(const AdjacencyList * graph);
 private:
+	// эйлеровы циклы
 	static bool checkEulerDegrees(const GraphContent * graph, bool & isCircleExists, int & tourStart); // O(
 	static set<pair<int, int>>::iterator Algorithm::chooseNextEdgeFleri(EdgeList * graph, int from);
 	static set<tuple<int, int, int>>::iterator Algorithm::chooseNextWeightedEdgeFleri(EdgeList * graph, int from);
+	// пометки
+	static const char marked = 1, unmarked = 0;
 	static bool hasUnmarked(const char * marks, int count, char unmarked = 0);
-	static int Algorithm::getUnmarked(const char * marks, int count, char unmarked = 0);
+	static int getUnmarked(const char * marks, int count, char unmarked = 0);
+	// паросочетания
+	static bool improveMatching(const AdjacencyList * graph, int from, int * matching);
 };
 

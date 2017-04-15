@@ -6,8 +6,7 @@ int main() {
 
 	graph.readGraph("D:\\test_graph.txt");
 
-	std::vector<char> marks;
-	int isBipart = graph.checkBipart(marks);
+	auto route = graph.getMaximumMatchingBipart();
 	
 	//graph.writeGraph("D:\\output_graph.txt");
 	

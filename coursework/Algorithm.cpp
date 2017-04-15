@@ -299,13 +299,12 @@ int Algorithm::getUnmarked(const char * marks, int count, char unmarked) {
 
 bool Algorithm::checkBipart(const AdjacencyList * graph, char * marks)
 {
-	const char marked = 1, unmarked = 0;
 	for (int i = 0; i < graph->vertexCount; ++i)
 		marks[i] = unmarked;
 
-	int from = 0;
-	do {
-		marks[from] = marked;
+	for (int from = 0; from < graph->vertexCount; ++from) {
+		if (marks[from] == unmarked)
+			marks[from] = marked;
 		if (!graph->isWeighted)
 			for (auto & to : graph->adjacencyList[from]) {
 				if (marks[to] == unmarked)
@@ -321,9 +320,67 @@ bool Algorithm::checkBipart(const AdjacencyList * graph, char * marks)
 				else if (marks[to] != -marks[from])
 					return false;
 			}
-		from = getUnmarked(marks, graph->vertexCount);
-	} while (from >= 0);
+	}
 	return true;
+}
+
+vector<pair<int, int>> Algorithm::getMaximumMatchingBipart(const AdjacencyList * graph)
+{
+	vector<pair<int, int>> result;
+	// бьём граф на доли : O(v^2)
+	char * marks = new char[graph->vertexCount];
+	if (!checkBipart(graph, marks))
+		 return result;
+	// считаем количество вершин в долях и выбираем первой долей меньшую : O(v)
+	int positivePartCount = 0, negativePartCount = 0;
+	for (int i = 0; i < graph->vertexCount; ++i) {
+		switch (marks[i]) {
+		case marked: ++positivePartCount; break;
+		case -marked: ++negativePartCount; break;
+		}
+	}
+	char lesserPart = (positivePartCount < negativePartCount) ? marked : -marked;
+	char greaterPart = -lesserPart;
+	// эвристическим методом делаем произвольное паросочетание : O(v^2)
+	bool * used = new bool[graph->vertexCount];
+	int * matching = new int[graph->vertexCount];
+	for (int i = 0; i < graph->vertexCount; ++i) {
+		used[i] = false;
+		matching[i] = -1;
+	}
+	for (int from = 0; from < graph->vertexCount; ++from)
+		if (matching[from] < 0)
+			for (auto & to : graph->adjacencyList[from])
+				if (matching[to] < 0) {
+					matching[from] = to;
+					matching[to] = from;
+					used[from] = used[to] = true;
+					break;
+				}
+	// для каждой неиспользованной вершины меньшей доли пытаемся улучшить паросочетание обходом в ширину : O(v^3)
+	for (int v = 0; v < graph->vertexCount; ++v)
+		if (marks[v] == lesserPart && !used[v])
+			improveMatching(graph, v, matching);
+	delete[] used;
+	// формируем результат по вершинам большей доли
+	for (int v = 0; v < graph->vertexCount; ++v)
+		if (marks[v] == greaterPart && matching[v] >= 0)
+			result.push_back(make_pair(v, matching[v]));
+	delete[] matching;
+	delete[] marks;
+	return result;
+}
+
+bool Algorithm::improveMatching(const AdjacencyList * graph, int from, int * matching) {
+	//if (used[from]) return false;
+	//used[from] = true;
+	for (auto & to : graph->adjacencyList[from])
+		if (matching[from] != to
+			&& (matching[to] == -1 || improveMatching(graph, matching[to], matching))) {
+			matching[to] = from;
+			return true;
+		}
+	return false;
 }
 
 bool Algorithm::checkEulerDegrees(const GraphContent * graph, bool & isCircleExists, int & tourStart)
