@@ -182,7 +182,7 @@ int AdjacencyList::getAdjacent(int from) const
 list<tuple<int, int, int>> AdjacencyList::getWeightedEdgesList() const
 {
 	list<tuple<int, int, int>> result;
-	for (int from = 0; from < weightedAdjacencyList.size(); ++from)
+	for (int from = 0; from < vertexCount; ++from)
 		for (const auto & adjacency : weightedAdjacencyList[from]) {
 			int to = adjacency.first;
 			int weight = adjacency.second;

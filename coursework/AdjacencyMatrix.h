@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "GraphContent.h"
 #include <vector>
 
@@ -16,6 +16,11 @@ public:
 	void read(istream & inpFile) override;
 	void write(ostream & outFile) override;
 
+	/* O(v^2) */
+	list<tuple<int, int, int>> getWeightedEdgesList() const override;
+	/* O(v^2) */
+	tuple<int, int, int> findMinEdge(bool * isMarked) const override;
+	
 	GraphContent * getCopy() const override;
 
 	bool hasEdges() const override;								// O(v^2)
