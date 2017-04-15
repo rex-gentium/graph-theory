@@ -211,16 +211,17 @@ int Graph::checkEuler(bool & circleExist)
 vector<int> Graph::getEuleranTourFleri()
 {
 	vector<int> result;
-	switch (currentRepr) {
-	case ADJMATRIX:
-		result = Algorithm::getEuleranTourFleri(dynamic_cast<AdjacencyMatrix*>(content)); break;
-	case ADJLIST:
-		result = Algorithm::getEuleranTourFleri(dynamic_cast<AdjacencyList*>(content)); break;
-	case EDGELIST:
-		result = Algorithm::getEuleranTourFleri(dynamic_cast<EdgeList*>(content)); break;
-	}
+	RepresentationType lastRepr = this->currentRepr;
+	this->transformToListOfEdges();
+	result = Algorithm::getEuleranTourFleri(dynamic_cast<EdgeList *>(content));
+	// поправка на нумерацию
 	for (int i = 0; i < result.size(); ++i)
 		++result[i];
+	// back transform
+	switch (lastRepr) {
+	case ADJMATRIX: transformToAdjMatrix(); break;
+	case ADJLIST: transformToAdjList(); break;
+	}
 	return result;
 }
 

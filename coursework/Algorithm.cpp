@@ -173,92 +173,76 @@ vector<int> Algorithm::getEuleranTour(const GraphContent * graph)
 			st.push(w);
 		}
 	}
+	delete copy;
 	std::reverse(tour.begin(), tour.end()); // O(e)
 	return tour;
 }
 
-vector<int> Algorithm::getEuleranTourFleri(const AdjacencyMatrix * graph)
-{
-	vector<int> tour;
-	bool isEuleranCircle;
-	int tourStart;
-	if (!checkEuler(graph, isEuleranCircle, tourStart)) // O(v^2) 
-		return tour;
-	if (isEuleranCircle)
-		tourStart = 0;
-	tour.push_back(tourStart);
-	
-	AdjacencyMatrix copy(*graph);
-	int currentVertex = tourStart;
-	int bridgeVertex = -1; // на случай если попадется мост
-	int nextVertex = -1;
-	while (copy.hasEdges()) {
-		for (int to = 0; to < graph->vertexCount; ++to) {
-			if (copy.adjacencyMatrix[currentVertex][to])
-				if (copy.isBridge(currentVertex, to)) // O(v^2)
-					bridgeVertex = to;
-				else {
-					nextVertex = to;
-					break;
-				}	
-		}
-		// мост выбирается в последнюю очередь
-		if (nextVertex < 0)
-			nextVertex = bridgeVertex;
-		tour.push_back(nextVertex);
-		copy.removeEdge(currentVertex, nextVertex); // O(1)
-		currentVertex = nextVertex;
-		nextVertex = bridgeVertex = -1;
-	}
-	return tour;
-}
-
-vector<int> Algorithm::getEuleranTourFleri(const AdjacencyList * graph)
-{
-	vector<int> tour;
-	bool isEuleranCircle;
-	int tourStart;
-	if (!checkEuler(graph, isEuleranCircle, tourStart)) // O(v*log(v))
-		return tour;
-	if (isEuleranCircle)
-		tourStart = 0;
-	tour.push_back(tourStart);
-
-	AdjacencyList copy(*graph);
-	int currentVertex = tourStart;
-	int bridgeVertex = -1; // на случай если попадется мост
-	int nextVertex = -1;
-	while (copy.hasEdges()) {
-		if (copy.isWeighted) {
-			for (const auto & adjacency : copy.weightedAdjacencyList[currentVertex])
-				if (copy.isBridge(currentVertex, adjacency.first)) // O(v*log(v))
-					bridgeVertex = adjacency.first;
-				else {
-					nextVertex = adjacency.first;
-					break;
-				}
-		}
+set<pair<int, int>>::iterator Algorithm::chooseNextEdgeFleri(EdgeList * graph, int from) {
+	auto chosen = graph->edgeList.end();
+	auto bridge = graph->edgeList.end();
+	auto edge = graph->edgeList.lower_bound(make_pair(from, 0)); // log(e)
+	while (edge != graph->edgeList.end() && edge->first == from) {
+		int to = edge->second;
+		if (graph->isBridge(from, to)) // O(e)
+			bridge = edge;
 		else {
-			for (const auto & to : copy.adjacencyList[currentVertex])
-				if (copy.isBridge(currentVertex, to))
-					bridgeVertex = to;
-				else {
-					nextVertex = to;
-					break;
-				}
+			chosen = edge;
+			break;
 		}
-		// мост выбирается в последнюю очередь
-		if (nextVertex < 0)
-			nextVertex = bridgeVertex;
-		tour.push_back(nextVertex);
-		copy.removeEdge(currentVertex, nextVertex); // O(logv)
-		currentVertex = nextVertex;
-		nextVertex = bridgeVertex = -1;
+		++edge;
 	}
-	return tour;
+	if (chosen == graph->edgeList.end() && bridge == graph->edgeList.end() && !graph->isDirected) {
+		// редкий случай только в неориентированном графе: искомое ребро было инвертировано
+		for (auto & edge = graph->edgeList.begin(); edge != graph->edgeList.end() && edge->second == from; ++edge) {
+			int to = edge->first;
+			if (graph->isBridge(from, to)) // O(e)
+				bridge = edge;
+			else {
+				chosen = edge;
+				break;
+			}
+			++edge;
+		}
+	}
+	if (chosen == graph->edgeList.end()) // мост выбирается в последнюю очередь
+		chosen = bridge;
+	return chosen;
 }
 
-vector<int> Algorithm::getEuleranTourFleri(const EdgeList * graph)
+set<tuple<int, int, int>>::iterator Algorithm::chooseNextWeightedEdgeFleri(EdgeList * graph, int from) {
+	auto chosen = graph->weightedEdgeList.end();
+	auto bridge = graph->weightedEdgeList.end();
+	auto edge = graph->weightedEdgeList.lower_bound(make_tuple(from, 0, 0)); // log(e)
+	while (edge != graph->weightedEdgeList.end() && get<0>(*edge) == from) {
+		int to = get<1>(*edge);
+		if (graph->isBridge(from, to)) // O(e)
+			bridge = edge;
+		else {
+			chosen = edge;
+			break;
+		}
+		++edge;
+	}
+	if (chosen == graph->weightedEdgeList.end() && bridge == graph->weightedEdgeList.end()) {
+		// редкий случай, только в неориентированном графе
+		for (auto & edge = graph->weightedEdgeList.begin(); edge != graph->weightedEdgeList.end() && get<1>(*edge) == from; ++edge) {
+			int to = get<0>(*edge);
+			if (graph->isBridge(from, to)) // O(e)
+				bridge = edge;
+			else {
+				chosen = edge;
+				break;
+			}
+			++edge;
+		}
+	}
+	if (chosen == graph->weightedEdgeList.end()) // мост выбирается в последнюю очередь
+		chosen = bridge;
+	return chosen;
+}
+
+vector<int> Algorithm::getEuleranTourFleri(EdgeList * graph)
 {
 	vector<int> tour;
 	bool isEuleranCircle;
@@ -268,46 +252,41 @@ vector<int> Algorithm::getEuleranTourFleri(const EdgeList * graph)
 	if (isEuleranCircle)
 		tourStart = 0;
 	tour.push_back(tourStart);
-
-	EdgeList copy(*graph);
 	int currentVertex = tourStart;
-	int bridgeVertex = -1; // на случай если попадется мост
-	int nextVertex = -1;
-	while (copy.hasEdges()) {
-		if (copy.isWeighted) {
-			auto edge = copy.weightedEdgeList.lower_bound(make_tuple(currentVertex, 0, 0)); // log(e)
-			while (edge != copy.weightedEdgeList.end() && get<0>(*edge) == currentVertex) {
-				int to = get<1>(*edge);
-				if (copy.isBridge(currentVertex, to)) // O(e)
-					bridgeVertex = to;
-				else {
-					nextVertex = to;
-					break;
-				}
-				++edge;
-			}
+
+	if (!graph->isWeighted) {
+		stack<pair<int, int>> removedEdges;
+		while (graph->hasEdges()) {
+			set<pair<int, int>>::iterator chosen = chooseNextEdgeFleri(graph, currentVertex);
+			int nextVertex = chosen->second;
+			tour.push_back(nextVertex);
+			graph->edgeList.erase(chosen);
+			removedEdges.push(*chosen);
+			currentVertex = nextVertex;
 		}
-		else {
-			auto edge = copy.edgeList.lower_bound(make_pair(currentVertex, 0));
-			while (edge != copy.edgeList.end() && edge->first == currentVertex) {
-				int to = edge->second;
-				if (copy.isBridge(currentVertex, to))
-					bridgeVertex = to;
-				else {
-					nextVertex = to;
-					break;
-				}
-				++edge;
-			}
+		while (!removedEdges.empty()) {
+			pair<int, int> edge = removedEdges.top();
+			graph->addEdge(edge.first, edge.second, 0);
+			removedEdges.pop();
 		}
-		// мост выбирается в последнюю очередь
-		if (nextVertex < 0)
-			nextVertex = bridgeVertex;
-		tour.push_back(nextVertex);
-		copy.removeEdge(currentVertex, nextVertex);
-		currentVertex = nextVertex;
-		nextVertex = bridgeVertex = -1;
 	}
+	else {
+		stack<tuple<int, int, int>> removedEdges;
+		while (graph->hasEdges()) {
+			set<tuple<int, int, int>>::iterator chosen = chooseNextWeightedEdgeFleri(graph, currentVertex);
+			int nextVertex = get<1>(*chosen);
+			tour.push_back(nextVertex);
+			graph->weightedEdgeList.erase(chosen);
+			removedEdges.push(*chosen);
+			currentVertex = nextVertex;
+		}
+		while (!removedEdges.empty()) {
+			tuple<int, int, int> edge = removedEdges.top();
+			graph->addEdge(get<0>(edge), get<1>(edge), get<2>(edge));
+			removedEdges.pop();
+		}
+	}
+
 	return tour;
 }
 
