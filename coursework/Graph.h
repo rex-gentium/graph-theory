@@ -26,6 +26,11 @@ public:
 	Graph getSpaingTreePrima();
 	Graph getSpaingTreeKruscal();
 	Graph getSpaingTreeBoruvka();
+
+	int checkEuler(bool &circleExist);
+	vector<int> getEuleranTourFleri();
+	vector<int> getEuleranTourEffective();
+
 private:
 	GraphContent * content;
 	RepresentationType currentRepr;

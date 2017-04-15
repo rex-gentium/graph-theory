@@ -76,6 +76,26 @@ void AdjacencyList::write(ostream & outFile) {
 	}
 }
 
+GraphContent * AdjacencyList::getCopy() const
+{
+	return new AdjacencyList(*this);
+}
+
+bool AdjacencyList::hasEdges() const
+{
+	if (isWeighted) {
+		for (int i = 0; i < vertexCount; ++i)
+			if (!weightedAdjacencyList[i].empty())
+				return true;
+	}
+	else {
+		for (int i = 0; i < vertexCount; ++i)
+			if (!adjacencyList[i].empty())
+				return true;
+	}
+	return false;
+}
+
 void AdjacencyList::addEdge(int from, int to, int weight) {
 	if (isWeighted) {
 		weightedAdjacencyList[from].insert(make_pair(to, weight));
@@ -143,6 +163,22 @@ void AdjacencyList::removeEdge(int from, int to) {
 	}
 }
 
+int AdjacencyList::getWeight(int from, int to) const
+{
+	if (!isWeighted)
+		return 0;
+	auto it = weightedAdjacencyList[from].lower_bound(make_pair(to, 0));
+	return (it != weightedAdjacencyList[from].end()) ? it->second : 0;
+}
+
+int AdjacencyList::getAdjacent(int from) const
+{
+	if (isWeighted)
+		return (weightedAdjacencyList[from].empty()) ? -1 : weightedAdjacencyList[from].begin()->first;
+	else
+		return (adjacencyList[from].empty()) ? -1 : *adjacencyList[from].begin();
+}
+
 list<tuple<int, int, int>> AdjacencyList::getWeightedEdgesList() const
 {
 	list<tuple<int, int, int>> result;
@@ -173,4 +209,110 @@ tuple<int, int, int> AdjacencyList::findMinEdge(bool * isMarked) const
 		}
 	}
 	return make_tuple(minI, minJ, minWeight);
+}
+
+int AdjacencyList::getVertexDegree(int vertex) const
+{
+	if (isDirected)
+		return getVertexInDegree(vertex) + getVertexOutDegree(vertex);
+	int degree = 0;
+	if (isWeighted) {
+		degree = weightedAdjacencyList[vertex].size();
+		if (weightedAdjacencyList[vertex].lower_bound(make_pair(vertex, 0)) != weightedAdjacencyList[vertex].end())
+			++degree; // петля учитывается дважды
+	}
+	else {
+		degree = adjacencyList[vertex].size();
+		if (adjacencyList[vertex].find(vertex) != adjacencyList[vertex].end())
+			++degree; // петля учитывается дважды
+	}
+	return 0;
+}
+
+vector<int> AdjacencyList::getVerticesDegrees() const
+{
+	vector<int> degrees(vertexCount);
+	for (int v = 0; v < vertexCount; ++v)
+		degrees[v] = getVertexDegree(v);
+	return degrees;
+}
+
+int AdjacencyList::getVertexInDegree(int vertex) const
+{
+	if (!isDirected) return getVertexDegree(vertex);
+	int inDegree = 0;
+	if (!isWeighted) {
+		for (int from = 0; from < vertexCount; ++from)
+			if (adjacencyList[from].find(vertex) != adjacencyList[from].end())
+				++inDegree;
+	}
+	else {
+		for (int from = 0; from < vertexCount; ++from)
+			if (weightedAdjacencyList[from].lower_bound(make_pair(vertex, 0)) != weightedAdjacencyList[from].end())
+				++inDegree;
+	}
+	return inDegree;
+}
+
+int AdjacencyList::getVertexOutDegree(int vertex) const
+{
+	if (!isDirected) return getVertexDegree(vertex);
+	return (isWeighted) ? weightedAdjacencyList[vertex].size() : adjacencyList[vertex].size();
+}
+
+vector<int> AdjacencyList::getVerticesInDegrees() const
+{
+	vector<int> inDegrees(vertexCount, 0);
+	for (int v = 0; v < vertexCount; ++v)
+		if (isWeighted)
+			for (const auto & adjacency : weightedAdjacencyList[v])
+				++inDegrees[adjacency.first];
+		else for (const auto & adjacency : adjacencyList[v])
+				++inDegrees[adjacency];
+	return inDegrees;
+}
+
+vector<int> AdjacencyList::getVerticesOutDegrees() const
+{
+	vector<int> outDegrees(vertexCount);
+	for (int v = 0; v < vertexCount; ++v)
+		outDegrees[v] = getVertexOutDegree(v);
+	return outDegrees;
+}
+
+DSU AdjacencyList::getUnityComponents() const
+{
+	DSU * result = new DSU(vertexCount);
+	if (isWeighted)
+		for (int from = 0; from < vertexCount; ++from)
+			for (const auto & adjacency : weightedAdjacencyList[from])
+				result->unite(from, adjacency.first);
+	else
+		for (int from = 0; from < vertexCount; ++from)
+			for (const auto & to : adjacencyList[from])
+				result->unite(from, to);
+	return *result;
+}
+
+DSU AdjacencyList::getUnityComponents(int exceptFrom, int exceptTo) const
+{
+	DSU * result = new DSU(vertexCount);
+	if (isWeighted)
+		for (int from = 0; from < vertexCount; ++from)
+			for (const auto & adjacency : weightedAdjacencyList[from]) {
+				int to = adjacency.first;
+				if (from == exceptFrom && to == exceptTo
+					|| !isDirected && from == exceptTo && to == exceptFrom)
+					continue;
+				result->unite(from, adjacency.first);
+			}
+	else
+		for (int from = 0; from < vertexCount; ++from)
+			for (const auto & to : adjacencyList[from]) {
+				if (from == exceptFrom && to == exceptTo
+					|| !isDirected && from == exceptTo && to == exceptFrom)
+					continue;
+				result->unite(from, to);
+			}
+	return *result;
 }

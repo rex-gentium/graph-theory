@@ -201,3 +201,33 @@ Graph Graph::getSpaingTreeBoruvka()
 	}
 	return *result;
 }
+
+int Graph::checkEuler(bool & circleExist)
+{
+	int result;
+	return (Algorithm::checkEuler(this->content, circleExist, result)) ? result + 1 : 0;
+}
+
+vector<int> Graph::getEuleranTourFleri()
+{
+	vector<int> result;
+	switch (currentRepr) {
+	case ADJMATRIX:
+		result = Algorithm::getEuleranTourFleri(dynamic_cast<AdjacencyMatrix*>(content)); break;
+	case ADJLIST:
+		result = Algorithm::getEuleranTourFleri(dynamic_cast<AdjacencyList*>(content)); break;
+	case EDGELIST:
+		result = Algorithm::getEuleranTourFleri(dynamic_cast<EdgeList*>(content)); break;
+	}
+	for (int i = 0; i < result.size(); ++i)
+		++result[i];
+	return result;
+}
+
+vector<int> Graph::getEuleranTourEffective()
+{
+	vector<int> result = Algorithm::getEuleranTour(this->content);
+	for (int i = 0; i < result.size(); ++i)
+		++result[i];
+	return result;
+}
