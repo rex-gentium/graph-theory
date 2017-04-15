@@ -148,6 +148,8 @@ Graph Graph::getSpaingTreePrima() {
 	Graph * result = new Graph();
 	if (content->isDirected || !content->isWeighted) 
 		return *result; // бессмысленная операция
+	RepresentationType repr = this->currentRepr;
+	this->transformToListOfEdges();
 	result->content = Algorithm::getSpaingTreePrima(this->content);
 	if (dynamic_cast<AdjacencyMatrix*>(result->content))
 		result->currentRepr = ADJMATRIX;
@@ -155,6 +157,11 @@ Graph Graph::getSpaingTreePrima() {
 		result->currentRepr = ADJLIST;
 	else if (dynamic_cast<EdgeList*>(result->content))
 		result->currentRepr = EDGELIST;
+	// back transform
+	switch (repr) {
+	case ADJMATRIX: transformToAdjMatrix(); break;
+	case ADJLIST: transformToAdjList();  break;
+	}
 	return *result;
 }
 
