@@ -260,8 +260,8 @@ vector<int> Algorithm::getEuleranTourFleri(EdgeList * graph)
 			set<pair<int, int>>::iterator chosen = chooseNextEdgeFleri(graph, currentVertex);
 			int nextVertex = chosen->second;
 			tour.push_back(nextVertex);
-			graph->edgeList.erase(chosen);
 			removedEdges.push(*chosen);
+			graph->edgeList.erase(chosen);
 			currentVertex = nextVertex;
 		}
 		while (!removedEdges.empty()) {
@@ -276,8 +276,8 @@ vector<int> Algorithm::getEuleranTourFleri(EdgeList * graph)
 			set<tuple<int, int, int>>::iterator chosen = chooseNextWeightedEdgeFleri(graph, currentVertex);
 			int nextVertex = get<1>(*chosen);
 			tour.push_back(nextVertex);
-			graph->weightedEdgeList.erase(chosen);
 			removedEdges.push(*chosen);
+			graph->weightedEdgeList.erase(chosen);
 			currentVertex = nextVertex;
 		}
 		while (!removedEdges.empty()) {

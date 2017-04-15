@@ -282,21 +282,21 @@ vector<int> AdjacencyList::getVerticesOutDegrees() const
 
 DSU AdjacencyList::getUnityComponents() const
 {
-	DSU * result = new DSU(vertexCount);
+	DSU result(vertexCount);
 	if (isWeighted)
 		for (int from = 0; from < vertexCount; ++from)
 			for (const auto & adjacency : weightedAdjacencyList[from])
-				result->unite(from, adjacency.first);
+				result.unite(from, adjacency.first);
 	else
 		for (int from = 0; from < vertexCount; ++from)
 			for (const auto & to : adjacencyList[from])
-				result->unite(from, to);
-	return *result;
+				result.unite(from, to);
+	return result;
 }
 
 DSU AdjacencyList::getUnityComponents(int exceptFrom, int exceptTo) const
 {
-	DSU * result = new DSU(vertexCount);
+	DSU result(vertexCount);
 	if (isWeighted)
 		for (int from = 0; from < vertexCount; ++from)
 			for (const auto & adjacency : weightedAdjacencyList[from]) {
@@ -304,7 +304,7 @@ DSU AdjacencyList::getUnityComponents(int exceptFrom, int exceptTo) const
 				if (from == exceptFrom && to == exceptTo
 					|| !isDirected && from == exceptTo && to == exceptFrom)
 					continue;
-				result->unite(from, adjacency.first);
+				result.unite(from, adjacency.first);
 			}
 	else
 		for (int from = 0; from < vertexCount; ++from)
@@ -312,7 +312,7 @@ DSU AdjacencyList::getUnityComponents(int exceptFrom, int exceptTo) const
 				if (from == exceptFrom && to == exceptTo
 					|| !isDirected && from == exceptTo && to == exceptFrom)
 					continue;
-				result->unite(from, to);
+				result.unite(from, to);
 			}
-	return *result;
+	return result;
 }
