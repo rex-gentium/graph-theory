@@ -127,6 +127,7 @@ tuple<int, int, int> AdjacencyMatrix::findMinEdge(bool * isMarked) const
 		}
 	}
 	return make_tuple(minI, minJ, minWeight);
+}
   
   int AdjacencyMatrix::getVertexDegree(int vertex) const
 {
