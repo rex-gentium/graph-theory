@@ -25,7 +25,7 @@ public:
 	int getAdjacent(int from) const override;					// O(e)
 
 	list<tuple<int, int, int>> getWeightedEdgesList() const override; // O(e)
-	tuple<int, int, int> findMinEdge(bool * isMarked) const override; // O(e)
+	tuple<int, int, int> findMinEdge(char * isMarked) const override; // O(e)
 
 	int getVertexDegree(int vertex) const override;		// O(e)
 	vector<int> getVerticesDegrees() const override;	// O(e)

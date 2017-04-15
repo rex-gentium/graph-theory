@@ -10,36 +10,29 @@ GraphContent * Algorithm::getSpaingTreePrima(const GraphContent * graph) {
 	result->vertexCount = graph->vertexCount;
 	result->isDirected = graph->isDirected;
 	result->isWeighted = graph->isWeighted;
-	bool * isMarked = new bool[graph->vertexCount];
+	const char marked = 1, unmarked = 0;
+	char * marks = new char[graph->vertexCount];
 	for (int i = 0; i < graph->vertexCount; i++)
-		isMarked[i] = false;
+		marks[i] = unmarked;
 
-	isMarked[0] = true;
-	bool hasUnmarked = (graph->vertexCount == 1) ? false : true;
-	while (hasUnmarked) {
+	marks[0] = marked;
+	while (hasUnmarked(marks, graph->vertexCount)) {
 		// ищем минимальное из ребёр, соединяющих помеченную вершину с непомеченной
-		tuple<int, int, int> edge = graph->findMinEdge(isMarked);
+		tuple<int, int, int> edge = graph->findMinEdge(marks);
 		int from = get<0>(edge), to = get<1>(edge), weight = get<2>(edge);
 		if (from >= 0 && to >= 0) {
 			result->addEdge(from, to, weight);
-			isMarked[from] = isMarked[to] = true;
+			marks[from] = marks[to] = marked;
 		}
 		else { // если не нашли никакого ребра, помечаем любую недостижимую вершину
 			for (int i = 0; i < graph->vertexCount; i++)
-				if (!isMarked[i]) {
-					isMarked[i] = true;
+				if (marks[i] == unmarked) {
+					marks[i] = marked;
 					break;
 				};
 		}
-		// смотрим, есть ли ещё непомеченные
-		hasUnmarked = false;
-		for (int i = 0; i < graph->vertexCount; i++)
-			if (!isMarked[i]) {
-				hasUnmarked = true;
-				break;
-			}
 	}
-	delete[] isMarked;
+	delete[] marks;
 	return result;
 }
 
@@ -288,6 +281,49 @@ vector<int> Algorithm::getEuleranTourFleri(EdgeList * graph)
 	}
 
 	return tour;
+}
+
+bool Algorithm::hasUnmarked(const char * marks, int count, char unmarked) {
+	for (int i = 0; i < count; ++i)
+		if (marks[i] == unmarked)
+			return true;
+	return false;
+}
+
+int Algorithm::getUnmarked(const char * marks, int count, char unmarked) {
+	for (int i = 0; i < count; ++i)
+		if (marks[i] == unmarked)
+			return i;
+	return -1;
+}
+
+bool Algorithm::checkBipart(const AdjacencyList * graph, char * marks)
+{
+	const char marked = 1, unmarked = 0;
+	for (int i = 0; i < graph->vertexCount; ++i)
+		marks[i] = unmarked;
+
+	int from = 0;
+	do {
+		marks[from] = marked;
+		if (!graph->isWeighted)
+			for (auto & to : graph->adjacencyList[from]) {
+				if (marks[to] == unmarked)
+					marks[to] = -marks[from];
+				else if (marks[to] != -marks[from])
+					return false;
+			}
+		else
+			for (auto & adjacency : graph->weightedAdjacencyList[from]) {
+				int to = adjacency.first;
+				if (marks[to] == unmarked)
+					marks[to] = -marks[from];
+				else if (marks[to] != -marks[from])
+					return false;
+			}
+		from = getUnmarked(marks, graph->vertexCount);
+	} while (from >= 0);
+	return true;
 }
 
 bool Algorithm::checkEulerDegrees(const GraphContent * graph, bool & isCircleExists, int & tourStart)

@@ -11,11 +11,15 @@ public:
 	static GraphContent* getSpaingTreeBoruvka(const EdgeList * graph);			// O(e*log(v))
 	// эйлеровы циклы
 	static bool checkEuler(const GraphContent * graph, bool & isCircleExists, int & tourStart); // O(v^2) - AdjMatrix, O(v*log(v)) - AdjList, max(v,e) - EdgeList 
-	static vector<int> getEuleranTour(const GraphContent * graph);			// O(e)
-	static vector<int> getEuleranTourFleri(EdgeList * graph);			// O(e^3)
+	static vector<int> getEuleranTour(const GraphContent * graph);		// O(e)
+	static vector<int> getEuleranTourFleri(EdgeList * graph);			// O(e^2)
+	// паросочетания
+	static bool checkBipart(const AdjacencyList * graph, char * marks);
 private:
 	static bool checkEulerDegrees(const GraphContent * graph, bool & isCircleExists, int & tourStart); // O(
 	static set<pair<int, int>>::iterator Algorithm::chooseNextEdgeFleri(EdgeList * graph, int from);
 	static set<tuple<int, int, int>>::iterator Algorithm::chooseNextWeightedEdgeFleri(EdgeList * graph, int from);
+	static bool hasUnmarked(const char * marks, int count, char unmarked = 0);
+	static int Algorithm::getUnmarked(const char * marks, int count, char unmarked = 0);
 };
 

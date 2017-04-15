@@ -30,7 +30,7 @@ public:
 	/* возвращает список взвешенных рёбер графа <from, to, weight>*/
 	virtual list<tuple<int, int, int>> getWeightedEdgesList() const = 0;
 	/* возвращает минимальное по весу ребро <from, to, weight>, соединяющее любую помеченную вершину с любой непомеченной */
-	virtual tuple<int, int, int> findMinEdge(bool * isMarked) const = 0;
+	virtual tuple<int, int, int> findMinEdge(char * isMarked) const = 0;
 	
 	/* возвращает степень вершины */
 	virtual int getVertexDegree(int vertex) const = 0;

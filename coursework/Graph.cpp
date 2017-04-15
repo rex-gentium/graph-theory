@@ -239,3 +239,24 @@ vector<int> Graph::getEuleranTourEffective()
 		++result[i];
 	return result;
 }
+
+int Graph::checkBipart(vector<char>& marks)
+{
+	if (content->vertexCount <= 1)
+		return 0;
+	RepresentationType lastRepr = this->currentRepr;
+	this->transformToAdjList();
+	marks.resize(content->vertexCount);
+	bool result = Algorithm::checkBipart(dynamic_cast<AdjacencyList *>(content), marks.data());
+	// back transform
+	switch (lastRepr) {
+	case ADJMATRIX: transformToAdjMatrix(); break;
+	case EDGELIST: transformToListOfEdges(); break;
+	}
+	return (result) ? 1 : 0;
+}
+
+vector<pair<int, int>> Graph::getMaximumMatchingBipart()
+{
+	return vector<pair<int, int>>();
+}

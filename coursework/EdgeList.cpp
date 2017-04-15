@@ -136,7 +136,7 @@ list<tuple<int, int, int>> EdgeList::getWeightedEdgesList() const {
 	return list<tuple<int, int, int>>(weightedEdgeList.cbegin(), weightedEdgeList.cend());
 }
 
-tuple<int, int, int> EdgeList::findMinEdge(bool * isMarked) const
+tuple<int, int, int> EdgeList::findMinEdge(char * isMarked) const
 {
 	int minWeight = INT_MAX, minI = -1, minJ = -1;
 	for (const auto & edge : weightedEdgeList) {

@@ -6,7 +6,8 @@ int main() {
 
 	graph.readGraph("D:\\test_graph.txt");
 
-	vector<int> tour = graph.getEuleranTourEffective();
+	std::vector<char> marks;
+	int isBipart = graph.checkBipart(marks);
 	
 	//graph.writeGraph("D:\\output_graph.txt");
 	
