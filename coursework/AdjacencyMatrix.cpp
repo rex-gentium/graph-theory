@@ -198,6 +198,29 @@ DSU AdjacencyMatrix::getUnityComponents() const
 	return result;
 }
 
+list<tuple<int, int, int>> AdjacencyMatrix::findRoute(int start, int dest) const
+{
+	if (adjacencyMatrix[start][dest]) {
+		return list<tuple<int, int, int>>(1, make_tuple(start, dest, adjacencyMatrix[start][dest]));
+	}
+	else {
+		list<tuple<int, int, int>> resultBegin;
+		for (int next = start + 1; next < vertexCount; ++next)
+			if (adjacencyMatrix[start][next]) {
+				resultBegin.push_back(make_tuple(start, next, adjacencyMatrix[start][next]));
+				list<tuple<int, int, int>> resultEnd = this->findRoute(next, dest);
+				if (resultEnd.empty())
+					resultBegin.pop_back();
+				else {
+					resultBegin.splice(resultBegin.end(), resultEnd);
+					return resultBegin;
+				}
+			}
+		// если добрались сюда, то пути не нашли
+		return list<tuple<int, int, int>>();
+	}
+}
+
 DSU AdjacencyMatrix::getUnityComponents(int exceptFrom, int exceptTo) const
 {
 	DSU result(vertexCount);

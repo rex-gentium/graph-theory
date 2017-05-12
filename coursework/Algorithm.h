@@ -16,6 +16,8 @@ public:
 	// паросочетания
 	static bool checkBipart(const AdjacencyList * graph, char * marks);
 	static vector<pair<int, int>> getMaximumMatchingBipart(const AdjacencyList * graph);
+	// потоки
+	static GraphContent* getFlowFordFulkerson(const GraphContent * graph, int source, int sink);
 private:
 	// эйлеровы циклы
 	static bool checkEulerDegrees(const GraphContent * graph, bool & isCircleExists, int & tourStart); // O(

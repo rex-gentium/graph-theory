@@ -42,6 +42,10 @@ public:
 	int checkBipart(vector<char> &marks);
 	vector<pair<int, int>> getMaximumMatchingBipart();
 
+	/* потоки в сетях */
+	Graph flowFordFulkerson(int sourse, int sink);
+	Graph flowDinitz(int sourse, int sink);
+
 private:
 	GraphContent * content;
 	RepresentationType currentRepr;

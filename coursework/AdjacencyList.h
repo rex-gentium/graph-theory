@@ -36,6 +36,8 @@ public:
 
 	DSU getUnityComponents() const override; // O(v*log(v))
 
+	list<tuple<int, int, int>> findRoute(int start, int dest) const override;
+
 private:
 	vector<set<int>> adjacencyList;
 	vector<set<pair<int, int>>> weightedAdjacencyList;

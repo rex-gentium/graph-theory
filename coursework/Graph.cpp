@@ -275,3 +275,13 @@ vector<pair<int, int>> Graph::getMaximumMatchingBipart()
 	}
 	return result;
 }
+
+Graph Graph::flowFordFulkerson(int sourse, int sink)
+{
+	return Graph();
+}
+
+Graph Graph::flowDinitz(int sourse, int sink)
+{
+	return Graph();
+}

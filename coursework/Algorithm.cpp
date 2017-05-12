@@ -371,6 +371,13 @@ vector<pair<int, int>> Algorithm::getMaximumMatchingBipart(const AdjacencyList *
 	return result;
 }
 
+GraphContent * Algorithm::getFlowFordFulkerson(const GraphContent * graph, int source, int sink)
+{
+	GraphContent * result = graph->getCopy();
+	vector<tuple<int, int, int>> flowRoute = result->findRoute(source, sink);
+	return nullptr;
+}
+
 bool Algorithm::improveMatching(const AdjacencyList * graph, int from, int * matching) {
 	//if (used[from]) return false;
 	//used[from] = true;

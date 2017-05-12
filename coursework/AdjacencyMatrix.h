@@ -36,6 +36,8 @@ public:
 
 	DSU getUnityComponents() const override;	// O(v^2)
 
+	list<tuple<int, int, int>> findRoute(int start, int dest) const override; // O(v^2)
+
 private:
 	vector<vector<int>> adjacencyMatrix;
 

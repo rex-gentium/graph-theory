@@ -48,6 +48,8 @@ public:
 	virtual DSU getUnityComponents() const = 0;
 	/* возвращает первую вершину, смежную данной. если таких нет, возвращает -1 */
 	virtual int getAdjacent(int from) const = 0;
+	/* возвращает путь из одной вершины в другую в виде массива взвешенных рёбер */
+	virtual list<tuple<int, int, int>> findRoute(int start, int dest) const = 0;
 private:
 	/* костыль. возвращает компоненты [слабой] связности в виде системы непересекающихся множеств,
 	исключая из рассмотрения ребро (exceptFrom, exceptTo) */

@@ -294,6 +294,14 @@ DSU AdjacencyList::getUnityComponents() const
 	return result;
 }
 
+list<tuple<int, int, int>> AdjacencyList::findRoute(int start, int dest) const
+{
+	auto edge = weightedAdjacencyList[start].lower_bound(make_pair(dest, 0));
+	if (edge != weightedAdjacencyList[start].end())
+		return list<tuple<int, int, int>>(1, make_tuple(start, dest, edge->second));
+	return list<tuple<int, int, int>>();
+}
+
 DSU AdjacencyList::getUnityComponents(int exceptFrom, int exceptTo) const
 {
 	DSU result(vertexCount);
